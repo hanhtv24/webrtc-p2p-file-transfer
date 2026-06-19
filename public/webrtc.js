@@ -96,9 +96,16 @@ class PeerConnection {
       const slice     = buffer.slice(offset, Math.min(offset + CHUNK, buffer.byteLength));
       const chunkHash = await sha256Hex(slice);
 
+      // 🧪 DEMO: bật SIMULATE_CORRUPTION = true để giả lập chunk bị lỗi (hiển thị ô đỏ)
+      // Chunk thứ 2 (index 1) sẽ có hash sai → bên nhận phát hiện ngay
+      const SIMULATE_CORRUPTION = false;
+      const corruptedHash = (SIMULATE_CORRUPTION && chunkIndex === 1)
+        ? 'aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa'
+        : chunkHash;
+
       // Frame: [4B chunkIdx][4B fileIdLen][fileId][4B hashLen][hash][data]
       const fileIdB = new TextEncoder().encode(fileId);
-      const hashB   = new TextEncoder().encode(chunkHash);
+      const hashB   = new TextEncoder().encode(corruptedHash);
       const frame   = new ArrayBuffer(4 + 4 + fileIdB.length + 4 + hashB.length + slice.byteLength);
       const view    = new DataView(frame);
       const u8      = new Uint8Array(frame);

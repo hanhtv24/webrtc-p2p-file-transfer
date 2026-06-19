@@ -51,10 +51,11 @@ io.on("connection", (socket) => {
   // Lưu thông tin peer
   peers.set(socket.id, {
     id: peerId,
-    name: `${avatar.name} ${peerId}`,
+    name: avatar.name,
     status: "online",
     ip: clientIP,
     avatar: avatar.emoji,
+    color: avatar.color,
     device: deviceInfo.device,
     deviceIcon: deviceInfo.icon,
   });
@@ -65,6 +66,7 @@ io.on("connection", (socket) => {
     ip: clientIP,
     avatar: avatar.emoji,
     animalName: avatar.name,
+    color: avatar.color,
     device: deviceInfo.device,
     deviceIcon: deviceInfo.icon,
   });

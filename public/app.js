@@ -49,7 +49,7 @@ function setupSocket() {
 
   socket.on('your-id', async data => {
     state.myPeerId = data.peerId;
-    state.myName   = `${data.animalName} ${data.peerId}`;
+    state.myName   = data.animalName;
 
     // Show header elements
     $('my-peer-id').textContent = data.peerId;
@@ -215,7 +215,11 @@ function renderPeerList() {
     return `
       <div class="peer-item ${connected ? 'active' : ''}"
            data-sid="${p.socketId}" data-pid="${p.id}">
-        <div class="peer-emoji" onclick="connectToPeer('${p.id}')" style="cursor:pointer">${p.avatar || '🐾'}</div>
+        <div class="peer-avatar" onclick="connectToPeer('${p.id}')" style="cursor:pointer">
+          ${p.avatar && (p.avatar.startsWith('data:') || p.avatar.startsWith('http'))
+            ? `<img src="${p.avatar}" width="28" height="20" style="border-radius:3px;display:block;object-fit:cover">`
+            : `<span style="font-size:20px">${p.avatar || '⬡'}</span>`}
+        </div>
         <div class="peer-info" onclick="connectToPeer('${p.id}')" style="cursor:pointer;flex:1;min-width:0">
           <div class="peer-name">${esc(p.name)}</div>
           <div class="peer-id">${p.id} · ${p.deviceIcon || '💻'} ${p.device || ''}</div>
@@ -337,21 +341,173 @@ window.downloadFile = (socketId, fileId) => {
   state.webrtc.requestFile(socketId, fileId);
 };
 
+// ─── Chunk canvas minimap (dùng khi totalChunks > CANVAS_THRESHOLD) ──────────
+
+const CANVAS_THRESHOLD = 2000; // chunk > 2000 → canvas minimap
+const C_CELL = 7;              // cell size (px) bao gồm gap
+const C_GAP  = 1;
+const C_W    = C_CELL - C_GAP; // chiều rộng ô = 6px
+const C_MAX_ROWS = 12;         // tối đa 12 hàng → canvas cao tối đa 84px
+
+// Đọc màu từ CSS variable (hoạt động cả dark & light mode)
+function _cColors() {
+  const s = getComputedStyle(document.documentElement);
+  return {
+    pending: (s.getPropertyValue('--border') || '#1a2e55').trim(),
+    ok:      (s.getPropertyValue('--green')  || '#22c55e').trim(),
+    bad:     (s.getPropertyValue('--red')    || '#ef4444').trim(),
+    in:      (s.getPropertyValue('--gold')   || '#f5a623').trim(),
+  };
+}
+
+// Khởi tạo canvas & vẽ toàn bộ trạng thái pending
+function _initCanvas(fileId, totalChunks) {
+  const canvas = $(`cm-${fileId}`);
+  if (!canvas) return;
+
+  const cw = canvas.parentElement?.offsetWidth || 620;
+  canvas.width  = cw;
+
+  const cols    = Math.max(1, Math.floor(cw / C_CELL));
+  const rawRows = Math.ceil(totalChunks / cols);
+  const rows    = Math.min(rawRows, C_MAX_ROWS);
+  const cpc     = Math.ceil(totalChunks / (cols * rows)); // chunks per cell
+
+  canvas.height      = rows * C_CELL;
+  canvas.style.height = (rows * C_CELL) + 'px';
+
+  const t = state.transfers.get(fileId);
+  if (t) t._cv = { cols, rows, cpc };
+
+  _repaintCanvas(fileId);
+}
+
+// Vẽ lại toàn bộ canvas từ chunkStatus
+function _repaintCanvas(fileId) {
+  const canvas = $(`cm-${fileId}`);
+  const t = state.transfers.get(fileId);
+  if (!canvas || !t?._cv) return;
+
+  const { cols, rows, cpc } = t._cv;
+  const ctx    = canvas.getContext('2d');
+  const colors = _cColors();
+  const total  = cols * rows;
+
+  ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+  for (let ci = 0; ci < total; ci++) {
+    const s0 = ci * cpc;
+    if (s0 >= t.chunkStatus.length) break;
+    const s1  = Math.min(s0 + cpc, t.chunkStatus.length);
+    const sl  = t.chunkStatus.slice(s0, s1);
+
+    let color = colors.pending;
+    if      (sl.includes('bad'))           color = colors.bad;
+    else if (sl.includes('in'))            color = colors.in;
+    else if (sl.every(s => s === 'ok'))    color = colors.ok;
+
+    const col = ci % cols, row = Math.floor(ci / cols);
+    _roundRect(ctx, col * C_CELL, row * C_CELL, C_W, C_W, 2, color);
+  }
+}
+
+// Cập nhật 1 chunk (chỉ vẽ lại ô tương ứng)
+function _paintCell(fileId, chunkIdx, rawStatus) {
+  const canvas = $(`cm-${fileId}`);
+  const t = state.transfers.get(fileId);
+  if (!canvas || !t?._cv) return;
+
+  const { cols, cpc } = t._cv;
+  const ci = Math.floor(chunkIdx / cpc);
+
+  // Nếu cpc > 1: tính màu aggregate của cả bucket
+  let color;
+  const colors = _cColors();
+  if (cpc > 1) {
+    const s0 = ci * cpc, s1 = Math.min(s0 + cpc, t.chunkStatus.length);
+    const sl = t.chunkStatus.slice(s0, s1);
+    if      (sl.includes('bad'))        color = colors.bad;
+    else if (sl.includes('in'))         color = colors.in;
+    else if (sl.every(s => s === 'ok')) color = colors.ok;
+    else                                color = colors.pending;
+  } else {
+    color = colors[rawStatus] ?? colors.pending;
+  }
+
+  const col = ci % cols, row = Math.floor(ci / cols);
+  const ctx = canvas.getContext('2d');
+  _roundRect(ctx, col * C_CELL, row * C_CELL, C_W, C_W, 2, color);
+}
+
+function _roundRect(ctx, x, y, w, h, r, fill) {
+  ctx.fillStyle = fill;
+  ctx.beginPath();
+  ctx.moveTo(x + r, y);
+  ctx.lineTo(x + w - r, y);
+  ctx.quadraticCurveTo(x + w, y, x + w, y + r);
+  ctx.lineTo(x + w, y + h - r);
+  ctx.quadraticCurveTo(x + w, y + h, x + w - r, y + h);
+  ctx.lineTo(x + r, y + h);
+  ctx.quadraticCurveTo(x, y + h, x, y + h - r);
+  ctx.lineTo(x, y + r);
+  ctx.quadraticCurveTo(x, y, x + r, y);
+  ctx.closePath();
+  ctx.fill();
+}
+
+// Cập nhật summary badge (OK / lỗi / còn lại)
+function _updateSummary(fileId) {
+  const t = state.transfers.get(fileId);
+  if (!t || !t._cv) return;
+  const ok  = t.chunkStatus.filter(s => s === 'ok').length;
+  const bad = t.chunkStatus.filter(s => s === 'bad').length;
+  const pen = t.chunkStatus.length - ok - bad;
+  const okEl  = $(`cms-ok-${fileId}`);
+  const badEl = $(`cms-bad-${fileId}`);
+  const penEl = $(`cms-pen-${fileId}`);
+  if (okEl)  okEl.textContent  = `${ok.toLocaleString()} OK`;
+  if (badEl) { badEl.textContent = `${bad.toLocaleString()} lỗi`; badEl.style.display = bad ? '' : 'none'; }
+  if (penEl) { penEl.textContent = pen ? `${pen.toLocaleString()} chờ` : ''; penEl.style.display = pen ? '' : 'none'; }
+}
+
 // ─── Transfer cards ───────────────────────────────────────────────────────────
 
 function addTransferCard(fileId, name, size, totalChunks, dir, peerId) {
+  const useCanvas = totalChunks > CANVAS_THRESHOLD;
+
   state.transfers.set(fileId, {
     name, size, dir, peerId, startTime: Date.now(),
-    progress: 0, chunkStatus: new Array(totalChunks).fill('pending'),
+    progress: 0,
+    chunkStatus: new Array(totalChunks).fill('pending'),
+    useCanvas,
   });
 
   const card = document.createElement('div');
   card.className = 'transfer-card';
   card.id = `tc-${fileId}`;
 
-  const chunkCells = Array.from({ length: totalChunks }, (_, i) =>
-    `<div class="chunk-cell" id="cc-${fileId}-${i}"></div>`
-  ).join('');
+  // Chunk map HTML — div cells hoặc canvas tùy kích thước
+  let chunkMapHTML;
+  if (useCanvas) {
+    chunkMapHTML = `
+      <div class="chunk-map-label">
+        CHUNK MAP · ${totalChunks.toLocaleString()} CHUNKS × 16 KB
+        <span style="color:var(--gold);margin-left:6px;font-size:9px">MINIMAP</span>
+      </div>
+      <canvas id="cm-${fileId}" class="chunk-canvas"></canvas>
+      <div class="chunk-map-summary">
+        <span class="cms-item"><span class="cms-dot" style="background:var(--green)"></span><span id="cms-ok-${fileId}">0 OK</span></span>
+        <span class="cms-item" id="cms-bad-${fileId}" style="display:none"><span class="cms-dot" style="background:var(--red)"></span><span></span></span>
+        <span class="cms-item" id="cms-pen-${fileId}"><span class="cms-dot" style="background:var(--border)"></span><span>${totalChunks.toLocaleString()} chờ</span></span>
+      </div>`;
+  } else {
+    const chunkCells = Array.from({ length: totalChunks }, (_, i) =>
+      `<div class="chunk-cell" id="cc-${fileId}-${i}"></div>`
+    ).join('');
+    chunkMapHTML = `
+      <div class="chunk-map-label">CHUNK MAP · ${totalChunks} CHUNKS × 16 KB</div>
+      <div class="chunk-map" id="cm-${fileId}">${chunkCells}</div>`;
+  }
 
   card.innerHTML = `
     <div class="transfer-card-header">
@@ -368,12 +524,15 @@ function addTransferCard(fileId, name, size, totalChunks, dir, peerId) {
         <span id="ts-speed-${fileId}">— B/s</span>
         <span id="ts-pct-${fileId}">0%</span>
       </div>
-      <div class="chunk-map-label">Chunk map (${totalChunks} chunks × 16 KB)</div>
-      <div class="chunk-map" id="cm-${fileId}">${chunkCells}</div>
+      ${chunkMapHTML}
     </div>`;
 
   $('transfer-list').prepend(card);
   $('empty-state').style.display = 'none';
+
+  if (useCanvas) {
+    requestAnimationFrame(() => _initCanvas(fileId, totalChunks));
+  }
 }
 
 function updateTransferCard(fileId, pct, cur, tot, chunkIdx, chunkStatus) {
@@ -397,12 +556,15 @@ function updateTransferCard(fileId, pct, cur, tot, chunkIdx, chunkStatus) {
   if (sEl) sEl.textContent = `${fmtBytes(speed)}/s`;
   if (pEl) pEl.textContent = `${Math.round(pct)}%`;
 
-  // Chunk cell
+  // Chunk visualization
   if (chunkIdx != null) {
-    const cell = $(`cc-${fileId}-${chunkIdx}`);
-    if (cell) {
-      const status = chunkStatus ? chunkStatus[chunkIdx] : 'ok';
-      cell.className = `chunk-cell ${status === 'ok' ? 'ok' : status === 'bad' ? 'bad' : 'in'}`;
+    const status = chunkStatus ? chunkStatus[chunkIdx] : 'ok';
+    if (t.useCanvas) {
+      _paintCell(fileId, chunkIdx, status);
+      _updateSummary(fileId);
+    } else {
+      const cell = $(`cc-${fileId}-${chunkIdx}`);
+      if (cell) cell.className = `chunk-cell ${status === 'ok' ? 'ok' : status === 'bad' ? 'bad' : 'in'}`;
     }
   }
 }
@@ -416,12 +578,18 @@ function finishTransferCard(fileId, hashOk) {
 
   // Cập nhật tất cả chunk còn pending → ok
   if (t.chunkStatus) {
-    t.chunkStatus.forEach((s, i) => {
-      if (s === 'pending') {
-        const cell = $(`cc-${fileId}-${i}`);
-        if (cell) cell.className = 'chunk-cell ok';
-      }
-    });
+    if (t.useCanvas) {
+      t.chunkStatus = t.chunkStatus.map(s => s === 'pending' ? 'ok' : s);
+      _repaintCanvas(fileId);
+      _updateSummary(fileId);
+    } else {
+      t.chunkStatus.forEach((s, i) => {
+        if (s === 'pending') {
+          const cell = $(`cc-${fileId}-${i}`);
+          if (cell) cell.className = 'chunk-cell ok';
+        }
+      });
+    }
   }
 
   const pEl = $(`ts-pct-${fileId}`);

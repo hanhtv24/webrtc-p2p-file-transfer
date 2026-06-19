@@ -1,242 +1,544 @@
-// Danh sách 100 loài động vật với emoji
-const ANIMALS = [
-  { emoji: "🐶", name: "Chó" },
-  { emoji: "🐱", name: "Mèo" },
-  { emoji: "🐭", name: "Chuột" },
-  { emoji: "🐹", name: "Hamster" },
-  { emoji: "🐰", name: "Thỏ" },
-  { emoji: "🦊", name: "Cáo" },
-  { emoji: "🐻", name: "Gấu" },
-  { emoji: "🐼", name: "Gấu trúc" },
-  { emoji: "🐨", name: "Koala" },
-  { emoji: "🐯", name: "Hổ" },
-  { emoji: "🦁", name: "Sư tử" },
-  { emoji: "🐮", name: "Bò" },
-  { emoji: "🐷", name: "Heo" },
-  { emoji: "🐸", name: "Ếch" },
-  { emoji: "🐵", name: "Khỉ" },
-  { emoji: "🐔", name: "Gà" },
-  { emoji: "🐧", name: "Chim cánh cụt" },
-  { emoji: "🐦", name: "Chim" },
-  { emoji: "🐤", name: "Gà con" },
-  { emoji: "🦆", name: "Vịt" },
-  { emoji: "🦅", name: "Đại bàng" },
-  { emoji: "🦉", name: "Cú mèo" },
-  { emoji: "🦇", name: "Dơi" },
-  { emoji: "🐺", name: "Sói" },
-  { emoji: "🐗", name: "Heo rừng" },
-  { emoji: "🐴", name: "Ngựa" },
-  { emoji: "🦄", name: "Kỳ lân" },
-  { emoji: "🐝", name: "Ong" },
-  { emoji: "🐛", name: "Sâu" },
-  { emoji: "🦋", name: "Bướm" },
-  { emoji: "🐌", name: "Ốc sên" },
-  { emoji: "🐞", name: "Bọ rùa" },
-  { emoji: "🐜", name: "Kiến" },
-  { emoji: "🦗", name: "Dế" },
-  { emoji: "🐢", name: "Rùa" },
-  { emoji: "🐍", name: "Rắn" },
-  { emoji: "🦎", name: "Thằn lằn" },
-  { emoji: "🐊", name: "Cá sấu" },
-  { emoji: "🦖", name: "Khủng long" },
-  { emoji: "🐳", name: "Cá voi" },
-  { emoji: "🐬", name: "Cá heo" },
-  { emoji: "🦭", name: "Hải cẩu" },
-  { emoji: "🐟", name: "Cá" },
-  { emoji: "🐠", name: "Cá nhiệt đới" },
-  { emoji: "🐡", name: "Cá nóc" },
-  { emoji: "🦈", name: "Cá mập" },
-  { emoji: "🐙", name: "Bạch tuộc" },
-  { emoji: "🦀", name: "Cua" },
-  { emoji: "🦞", name: "Tôm hùm" },
-  { emoji: "🦐", name: "Tôm" },
-  { emoji: "🦑", name: "Mực" },
-  { emoji: "🐘", name: "Voi" },
-  { emoji: "🦏", name: "Tê giác" },
-  { emoji: "🦛", name: "Hà mã" },
-  { emoji: "🐪", name: "Lạc đà" },
-  { emoji: "🦒", name: "Hươu cao cổ" },
-  { emoji: "🦘", name: "Kangaroo" },
-  { emoji: "🦧", name: "Đười ươi" },
-  { emoji: "🦥", name: "Con lười" },
-  { emoji: "🦦", name: "Rái cá" },
-  { emoji: "🦨", name: "Chồn hôi" },
-  { emoji: "🦝", name: "Gấu mèo" },
-  { emoji: "🦃", name: "Gà tây" },
-  { emoji: "🦚", name: "Công" },
-  { emoji: "🦩", name: "Hồng hạc" },
-  { emoji: "🦜", name: "Vẹt" },
-  { emoji: "🦢", name: "Thiên nga" },
-  { emoji: "🐂", name: "Trâu" },
-  { emoji: "🐃", name: "Trâu nước" },
-  { emoji: "🐄", name: "Bò sữa" },
-  { emoji: "🐏", name: "Cừu đực" },
-  { emoji: "🐑", name: "Cừu" },
-  { emoji: "🐐", name: "Dê" },
-  { emoji: "🐫", name: "Lạc đà 2 bướu" },
-  { emoji: "🦙", name: "Llama" },
-  { emoji: "🦣", name: "Ma mút" },
-  { emoji: "🐈", name: "Mèo nhà" },
-  { emoji: "🐕", name: "Chó nhà" },
-  { emoji: "🦮", name: "Chó dẫn đường" },
-  { emoji: "🐩", name: "Chó Poodle" },
-  { emoji: "🐀", name: "Chuột cống" },
-  { emoji: "🐁", name: "Chuột nhắt" },
-  { emoji: "🐿️", name: "Sóc" },
-  { emoji: "🦔", name: "Nhím" },
-  { emoji: "🐉", name: "Rồng" },
-  { emoji: "🐲", name: "Rồng châu Á" },
-  { emoji: "🦕", name: "Khủng long cổ dài" },
-  { emoji: "🦤", name: "Chim Dodo" },
-  { emoji: "🪿", name: "Ngỗng" },
-  { emoji: "🐓", name: "Gà trống" },
-  { emoji: "🦌", name: "Hươu" },
-  { emoji: "🐾", name: "Thú cưng" },
-  { emoji: "🦫", name: "Hải ly" },
-  { emoji: "🪶", name: "Chim lông vũ" },
-  { emoji: "🦠", name: "Vi khuẩn" },
-  { emoji: "🐚", name: "Sò biển" },
-  { emoji: "🪼", name: "Sứa" },
-  { emoji: "🪸", name: "San hô" },
-  { emoji: "🦂", name: "Bọ cạp" },
+// ~500 cầu thủ đắt giá / nổi tiếng — World Cup 2026 era
+// flagcdn.com: ảnh cờ miễn phí, code = ISO 3166-1 alpha-2 (lowercase)
+const WC2026_PLAYERS = [
+  // ── ARGENTINA ──────────────────────────────────────────────────────────────
+  { name: "Lionel Messi",            country: "Argentina",      code: "ar", color: "#74ACDF" },
+  { name: "Lautaro Martínez",        country: "Argentina",      code: "ar", color: "#74ACDF" },
+  { name: "Julián Álvarez",          country: "Argentina",      code: "ar", color: "#74ACDF" },
+  { name: "Rodrigo De Paul",         country: "Argentina",      code: "ar", color: "#74ACDF" },
+  { name: "Alexis Mac Allister",     country: "Argentina",      code: "ar", color: "#74ACDF" },
+  { name: "Paulo Dybala",            country: "Argentina",      code: "ar", color: "#74ACDF" },
+  { name: "Enzo Fernández",          country: "Argentina",      code: "ar", color: "#74ACDF" },
+  { name: "Nahuel Molina",           country: "Argentina",      code: "ar", color: "#74ACDF" },
+  { name: "Marcos Acuña",            country: "Argentina",      code: "ar", color: "#74ACDF" },
+  { name: "Cristian Romero",         country: "Argentina",      code: "ar", color: "#74ACDF" },
+  { name: "Lisandro Martínez",       country: "Argentina",      code: "ar", color: "#74ACDF" },
+  { name: "Nicolás Otamendi",        country: "Argentina",      code: "ar", color: "#74ACDF" },
+  { name: "Emiliano Martínez",       country: "Argentina",      code: "ar", color: "#74ACDF" },
+  { name: "Ángel Di María",          country: "Argentina",      code: "ar", color: "#74ACDF" },
+  { name: "Giovani Lo Celso",        country: "Argentina",      code: "ar", color: "#74ACDF" },
+  { name: "Exequiel Palacios",       country: "Argentina",      code: "ar", color: "#74ACDF" },
+  { name: "Franco Mastantuono",      country: "Argentina",      code: "ar", color: "#74ACDF" },
+  { name: "Thiago Almada",           country: "Argentina",      code: "ar", color: "#74ACDF" },
+  { name: "Germán Pezzella",         country: "Argentina",      code: "ar", color: "#74ACDF" },
+  { name: "Leandro Paredes",         country: "Argentina",      code: "ar", color: "#74ACDF" },
+  // ── BRAZIL ─────────────────────────────────────────────────────────────────
+  { name: "Vinicius Jr",             country: "Brazil",         code: "br", color: "#009C3B" },
+  { name: "Rodrygo",                 country: "Brazil",         code: "br", color: "#009C3B" },
+  { name: "Neymar Jr",               country: "Brazil",         code: "br", color: "#009C3B" },
+  { name: "Raphinha",                country: "Brazil",         code: "br", color: "#009C3B" },
+  { name: "Endrick",                 country: "Brazil",         code: "br", color: "#009C3B" },
+  { name: "Gabriel Martinelli",      country: "Brazil",         code: "br", color: "#009C3B" },
+  { name: "Richarlison",             country: "Brazil",         code: "br", color: "#009C3B" },
+  { name: "Lucas Paquetá",           country: "Brazil",         code: "br", color: "#009C3B" },
+  { name: "Bruno Guimarães",         country: "Brazil",         code: "br", color: "#009C3B" },
+  { name: "Casemiro",                country: "Brazil",         code: "br", color: "#009C3B" },
+  { name: "Alisson",                 country: "Brazil",         code: "br", color: "#009C3B" },
+  { name: "Ederson",                 country: "Brazil",         code: "br", color: "#009C3B" },
+  { name: "Éder Militão",            country: "Brazil",         code: "br", color: "#009C3B" },
+  { name: "Marquinhos",              country: "Brazil",         code: "br", color: "#009C3B" },
+  { name: "Gabriel Magalhães",       country: "Brazil",         code: "br", color: "#009C3B" },
+  { name: "Savinho",                 country: "Brazil",         code: "br", color: "#009C3B" },
+  { name: "Estêvão",                 country: "Brazil",         code: "br", color: "#009C3B" },
+  { name: "Danilo",                  country: "Brazil",         code: "br", color: "#009C3B" },
+  { name: "Renan Lodi",              country: "Brazil",         code: "br", color: "#009C3B" },
+  { name: "Gerson",                  country: "Brazil",         code: "br", color: "#009C3B" },
+  // ── FRANCE ─────────────────────────────────────────────────────────────────
+  { name: "Kylian Mbappé",           country: "France",         code: "fr", color: "#002395" },
+  { name: "Antoine Griezmann",       country: "France",         code: "fr", color: "#002395" },
+  { name: "Ousmane Dembélé",         country: "France",         code: "fr", color: "#002395" },
+  { name: "Eduardo Camavinga",       country: "France",         code: "fr", color: "#002395" },
+  { name: "Aurélien Tchouaméni",     country: "France",         code: "fr", color: "#002395" },
+  { name: "Dayot Upamecano",         country: "France",         code: "fr", color: "#002395" },
+  { name: "Théo Hernández",          country: "France",         code: "fr", color: "#002395" },
+  { name: "Mike Maignan",            country: "France",         code: "fr", color: "#002395" },
+  { name: "Jules Koundé",            country: "France",         code: "fr", color: "#002395" },
+  { name: "William Saliba",          country: "France",         code: "fr", color: "#002395" },
+  { name: "N'Golo Kanté",            country: "France",         code: "fr", color: "#002395" },
+  { name: "Kingsley Coman",          country: "France",         code: "fr", color: "#002395" },
+  { name: "Marcus Thuram",           country: "France",         code: "fr", color: "#002395" },
+  { name: "Bradley Barcola",         country: "France",         code: "fr", color: "#002395" },
+  { name: "Randal Kolo Muani",       country: "France",         code: "fr", color: "#002395" },
+  { name: "Warren Zaïre-Emery",      country: "France",         code: "fr", color: "#002395" },
+  { name: "Mattéo Guendouzi",        country: "France",         code: "fr", color: "#002395" },
+  { name: "Adrien Rabiot",           country: "France",         code: "fr", color: "#002395" },
+  { name: "Benjamin Pavard",         country: "France",         code: "fr", color: "#002395" },
+  { name: "Ibrahima Konaté",         country: "France",         code: "fr", color: "#002395" },
+  // ── ENGLAND ────────────────────────────────────────────────────────────────
+  { name: "Jude Bellingham",         country: "England",        code: "gb-eng", color: "#CF081F" },
+  { name: "Harry Kane",              country: "England",        code: "gb-eng", color: "#CF081F" },
+  { name: "Bukayo Saka",             country: "England",        code: "gb-eng", color: "#CF081F" },
+  { name: "Phil Foden",              country: "England",        code: "gb-eng", color: "#CF081F" },
+  { name: "Trent Alexander-Arnold",  country: "England",        code: "gb-eng", color: "#CF081F" },
+  { name: "Declan Rice",             country: "England",        code: "gb-eng", color: "#CF081F" },
+  { name: "John Stones",             country: "England",        code: "gb-eng", color: "#CF081F" },
+  { name: "Marcus Rashford",         country: "England",        code: "gb-eng", color: "#CF081F" },
+  { name: "Jack Grealish",           country: "England",        code: "gb-eng", color: "#CF081F" },
+  { name: "Cole Palmer",             country: "England",        code: "gb-eng", color: "#CF081F" },
+  { name: "Kobbie Mainoo",           country: "England",        code: "gb-eng", color: "#CF081F" },
+  { name: "Eberechi Eze",            country: "England",        code: "gb-eng", color: "#CF081F" },
+  { name: "Anthony Gordon",          country: "England",        code: "gb-eng", color: "#CF081F" },
+  { name: "Kieran Trippier",         country: "England",        code: "gb-eng", color: "#CF081F" },
+  { name: "Jordan Pickford",         country: "England",        code: "gb-eng", color: "#CF081F" },
+  { name: "Levi Colwill",            country: "England",        code: "gb-eng", color: "#CF081F" },
+  { name: "Conor Gallagher",         country: "England",        code: "gb-eng", color: "#CF081F" },
+  { name: "Ollie Watkins",           country: "England",        code: "gb-eng", color: "#CF081F" },
+  { name: "Ivan Toney",              country: "England",        code: "gb-eng", color: "#CF081F" },
+  { name: "Luke Shaw",               country: "England",        code: "gb-eng", color: "#CF081F" },
+  // ── SPAIN ──────────────────────────────────────────────────────────────────
+  { name: "Pedri",                   country: "Spain",          code: "es", color: "#AA151B" },
+  { name: "Lamine Yamal",            country: "Spain",          code: "es", color: "#AA151B" },
+  { name: "Rodri",                   country: "Spain",          code: "es", color: "#AA151B" },
+  { name: "Gavi",                    country: "Spain",          code: "es", color: "#AA151B" },
+  { name: "Nico Williams",           country: "Spain",          code: "es", color: "#AA151B" },
+  { name: "Dani Olmo",               country: "Spain",          code: "es", color: "#AA151B" },
+  { name: "Álvaro Morata",           country: "Spain",          code: "es", color: "#AA151B" },
+  { name: "Fabián Ruiz",             country: "Spain",          code: "es", color: "#AA151B" },
+  { name: "Dani Carvajal",           country: "Spain",          code: "es", color: "#AA151B" },
+  { name: "Alejandro Grimaldo",      country: "Spain",          code: "es", color: "#AA151B" },
+  { name: "Aymeric Laporte",         country: "Spain",          code: "es", color: "#AA151B" },
+  { name: "Robin Le Normand",        country: "Spain",          code: "es", color: "#AA151B" },
+  { name: "Mikel Merino",            country: "Spain",          code: "es", color: "#AA151B" },
+  { name: "Fermín López",            country: "Spain",          code: "es", color: "#AA151B" },
+  { name: "Unai Simón",              country: "Spain",          code: "es", color: "#AA151B" },
+  { name: "Ferran Torres",           country: "Spain",          code: "es", color: "#AA151B" },
+  { name: "Martín Zubimendi",        country: "Spain",          code: "es", color: "#AA151B" },
+  { name: "Ansu Fati",               country: "Spain",          code: "es", color: "#AA151B" },
+  { name: "Marcos Llorente",         country: "Spain",          code: "es", color: "#AA151B" },
+  { name: "Eric García",             country: "Spain",          code: "es", color: "#AA151B" },
+  // ── GERMANY ────────────────────────────────────────────────────────────────
+  { name: "Jamal Musiala",           country: "Germany",        code: "de", color: "#FFCC00" },
+  { name: "Florian Wirtz",           country: "Germany",        code: "de", color: "#FFCC00" },
+  { name: "Kai Havertz",             country: "Germany",        code: "de", color: "#FFCC00" },
+  { name: "Antonio Rüdiger",         country: "Germany",        code: "de", color: "#FFCC00" },
+  { name: "Manuel Neuer",            country: "Germany",        code: "de", color: "#FFCC00" },
+  { name: "Marc-André ter Stegen",   country: "Germany",        code: "de", color: "#FFCC00" },
+  { name: "Joshua Kimmich",          country: "Germany",        code: "de", color: "#FFCC00" },
+  { name: "Leroy Sané",              country: "Germany",        code: "de", color: "#FFCC00" },
+  { name: "İlkay Gündogan",          country: "Germany",        code: "de", color: "#FFCC00" },
+  { name: "Serge Gnabry",            country: "Germany",        code: "de", color: "#FFCC00" },
+  { name: "Leon Goretzka",           country: "Germany",        code: "de", color: "#FFCC00" },
+  { name: "Thomas Müller",           country: "Germany",        code: "de", color: "#FFCC00" },
+  { name: "Niclas Füllkrug",         country: "Germany",        code: "de", color: "#FFCC00" },
+  { name: "Maximilian Mittelstädt",  country: "Germany",        code: "de", color: "#FFCC00" },
+  { name: "Chris Führich",           country: "Germany",        code: "de", color: "#FFCC00" },
+  { name: "Benjamin Henrichs",       country: "Germany",        code: "de", color: "#FFCC00" },
+  { name: "Granit Xhaka",            country: "Germany",        code: "de", color: "#FFCC00" },
+  { name: "Robert Andrich",          country: "Germany",        code: "de", color: "#FFCC00" },
+  // ── PORTUGAL ───────────────────────────────────────────────────────────────
+  { name: "Cristiano Ronaldo",       country: "Portugal",       code: "pt", color: "#006600" },
+  { name: "Bernardo Silva",          country: "Portugal",       code: "pt", color: "#006600" },
+  { name: "Rafael Leão",             country: "Portugal",       code: "pt", color: "#006600" },
+  { name: "Bruno Fernandes",         country: "Portugal",       code: "pt", color: "#006600" },
+  { name: "João Félix",              country: "Portugal",       code: "pt", color: "#006600" },
+  { name: "Rúben Dias",              country: "Portugal",       code: "pt", color: "#006600" },
+  { name: "João Cancelo",            country: "Portugal",       code: "pt", color: "#006600" },
+  { name: "Nuno Mendes",             country: "Portugal",       code: "pt", color: "#006600" },
+  { name: "Vitinha",                 country: "Portugal",       code: "pt", color: "#006600" },
+  { name: "Gonçalo Ramos",           country: "Portugal",       code: "pt", color: "#006600" },
+  { name: "Rúben Neves",             country: "Portugal",       code: "pt", color: "#006600" },
+  { name: "Diogo Jota",              country: "Portugal",       code: "pt", color: "#006600" },
+  { name: "Francisco Trincão",       country: "Portugal",       code: "pt", color: "#006600" },
+  { name: "Diogo Costa",             country: "Portugal",       code: "pt", color: "#006600" },
+  { name: "Pepe",                    country: "Portugal",       code: "pt", color: "#006600" },
+  { name: "Otávio",                  country: "Portugal",       code: "pt", color: "#006600" },
+  { name: "Pedro Neto",              country: "Portugal",       code: "pt", color: "#006600" },
+  { name: "João Neves",              country: "Portugal",       code: "pt", color: "#006600" },
+  // ── NETHERLANDS ────────────────────────────────────────────────────────────
+  { name: "Virgil van Dijk",         country: "Netherlands",    code: "nl", color: "#FF6600" },
+  { name: "Frenkie de Jong",         country: "Netherlands",    code: "nl", color: "#FF6600" },
+  { name: "Cody Gakpo",              country: "Netherlands",    code: "nl", color: "#FF6600" },
+  { name: "Denzel Dumfries",         country: "Netherlands",    code: "nl", color: "#FF6600" },
+  { name: "Memphis Depay",           country: "Netherlands",    code: "nl", color: "#FF6600" },
+  { name: "Tijjani Reijnders",       country: "Netherlands",    code: "nl", color: "#FF6600" },
+  { name: "Joshua Zirkzee",          country: "Netherlands",    code: "nl", color: "#FF6600" },
+  { name: "Teun Koopmeiners",        country: "Netherlands",    code: "nl", color: "#FF6600" },
+  { name: "Ryan Gravenberch",        country: "Netherlands",    code: "nl", color: "#FF6600" },
+  { name: "Nathan Aké",              country: "Netherlands",    code: "nl", color: "#FF6600" },
+  { name: "Xavi Simons",             country: "Netherlands",    code: "nl", color: "#FF6600" },
+  { name: "Jerdy Schouten",          country: "Netherlands",    code: "nl", color: "#FF6600" },
+  { name: "Donyell Malen",           country: "Netherlands",    code: "nl", color: "#FF6600" },
+  { name: "Stefan de Vrij",          country: "Netherlands",    code: "nl", color: "#FF6600" },
+  // ── BELGIUM ────────────────────────────────────────────────────────────────
+  { name: "Kevin De Bruyne",         country: "Belgium",        code: "be", color: "#EF3340" },
+  { name: "Romelu Lukaku",           country: "Belgium",        code: "be", color: "#EF3340" },
+  { name: "Leandro Trossard",        country: "Belgium",        code: "be", color: "#EF3340" },
+  { name: "Jérémy Doku",             country: "Belgium",        code: "be", color: "#EF3340" },
+  { name: "Thibaut Courtois",        country: "Belgium",        code: "be", color: "#EF3340" },
+  { name: "Yannick Carrasco",        country: "Belgium",        code: "be", color: "#EF3340" },
+  { name: "Charles De Ketelaere",    country: "Belgium",        code: "be", color: "#EF3340" },
+  { name: "Orel Mangala",            country: "Belgium",        code: "be", color: "#EF3340" },
+  { name: "Arthur Theate",           country: "Belgium",        code: "be", color: "#EF3340" },
+  { name: "Axel Witsel",             country: "Belgium",        code: "be", color: "#EF3340" },
+  { name: "Timothy Castagne",        country: "Belgium",        code: "be", color: "#EF3340" },
+  { name: "Loïs Openda",             country: "Belgium",        code: "be", color: "#EF3340" },
+  // ── ITALY ──────────────────────────────────────────────────────────────────
+  { name: "Nicolò Barella",          country: "Italy",          code: "it", color: "#009246" },
+  { name: "Gianluigi Donnarumma",    country: "Italy",          code: "it", color: "#009246" },
+  { name: "Sandro Tonali",           country: "Italy",          code: "it", color: "#009246" },
+  { name: "Federico Chiesa",         country: "Italy",          code: "it", color: "#009246" },
+  { name: "Lorenzo Pellegrini",      country: "Italy",          code: "it", color: "#009246" },
+  { name: "Davide Frattesi",         country: "Italy",          code: "it", color: "#009246" },
+  { name: "Alessandro Bastoni",      country: "Italy",          code: "it", color: "#009246" },
+  { name: "Federico Dimarco",        country: "Italy",          code: "it", color: "#009246" },
+  { name: "Giacomo Raspadori",       country: "Italy",          code: "it", color: "#009246" },
+  { name: "Gianluca Scamacca",       country: "Italy",          code: "it", color: "#009246" },
+  { name: "Ciro Immobile",           country: "Italy",          code: "it", color: "#009246" },
+  { name: "Bryan Cristante",         country: "Italy",          code: "it", color: "#009246" },
+  { name: "Wilfried Gnonto",         country: "Italy",          code: "it", color: "#009246" },
+  { name: "Giovanni Di Lorenzo",     country: "Italy",          code: "it", color: "#009246" },
+  { name: "Mateo Retegui",           country: "Italy",          code: "it", color: "#009246" },
+  { name: "Nicolò Zaniolo",          country: "Italy",          code: "it", color: "#009246" },
+  // ── CROATIA ────────────────────────────────────────────────────────────────
+  { name: "Luka Modrić",             country: "Croatia",        code: "hr", color: "#FF0000" },
+  { name: "Marcelo Brozović",        country: "Croatia",        code: "hr", color: "#FF0000" },
+  { name: "Mateo Kovačić",           country: "Croatia",        code: "hr", color: "#FF0000" },
+  { name: "Joško Gvardiol",          country: "Croatia",        code: "hr", color: "#FF0000" },
+  { name: "Dominik Livaković",       country: "Croatia",        code: "hr", color: "#FF0000" },
+  { name: "Ivan Perišić",            country: "Croatia",        code: "hr", color: "#FF0000" },
+  { name: "Andrej Kramarić",         country: "Croatia",        code: "hr", color: "#FF0000" },
+  { name: "Nikola Vlašić",           country: "Croatia",        code: "hr", color: "#FF0000" },
+  { name: "Lovro Majer",             country: "Croatia",        code: "hr", color: "#FF0000" },
+  // ── POLAND ─────────────────────────────────────────────────────────────────
+  { name: "Robert Lewandowski",      country: "Poland",         code: "pl", color: "#DC143C" },
+  { name: "Piotr Zieliński",         country: "Poland",         code: "pl", color: "#DC143C" },
+  { name: "Wojciech Szczęsny",       country: "Poland",         code: "pl", color: "#DC143C" },
+  { name: "Matty Cash",              country: "Poland",         code: "pl", color: "#DC143C" },
+  { name: "Sebastian Szymański",     country: "Poland",         code: "pl", color: "#DC143C" },
+  { name: "Nicola Zalewski",         country: "Poland",         code: "pl", color: "#DC143C" },
+  { name: "Kamil Grosicki",          country: "Poland",         code: "pl", color: "#DC143C" },
+  // ── SERBIA ─────────────────────────────────────────────────────────────────
+  { name: "Dušan Vlahović",          country: "Serbia",         code: "rs", color: "#C6363C" },
+  { name: "Aleksandar Mitrović",     country: "Serbia",         code: "rs", color: "#C6363C" },
+  { name: "Dušan Tadić",             country: "Serbia",         code: "rs", color: "#C6363C" },
+  { name: "Sergej Milinković-Savić", country: "Serbia",         code: "rs", color: "#C6363C" },
+  { name: "Sasa Lukić",              country: "Serbia",         code: "rs", color: "#C6363C" },
+  { name: "Predrag Rajković",        country: "Serbia",         code: "rs", color: "#C6363C" },
+  { name: "Filip Kostić",            country: "Serbia",         code: "rs", color: "#C6363C" },
+  // ── NORWAY ─────────────────────────────────────────────────────────────────
+  { name: "Erling Haaland",          country: "Norway",         code: "no", color: "#EF2B2D" },
+  { name: "Martin Ødegaard",         country: "Norway",         code: "no", color: "#EF2B2D" },
+  { name: "Antonio Nusa",            country: "Norway",         code: "no", color: "#EF2B2D" },
+  { name: "Sander Berge",            country: "Norway",         code: "no", color: "#EF2B2D" },
+  { name: "Alexander Sørloth",       country: "Norway",         code: "no", color: "#EF2B2D" },
+  { name: "Mohamed Elyounoussi",     country: "Norway",         code: "no", color: "#EF2B2D" },
+  // ── DENMARK ────────────────────────────────────────────────────────────────
+  { name: "Christian Eriksen",       country: "Denmark",        code: "dk", color: "#C60C30" },
+  { name: "Pierre-Emile Højbjerg",   country: "Denmark",        code: "dk", color: "#C60C30" },
+  { name: "Joakim Mæhle",            country: "Denmark",        code: "dk", color: "#C60C30" },
+  { name: "Andreas Christensen",     country: "Denmark",        code: "dk", color: "#C60C30" },
+  { name: "Rasmus Højlund",          country: "Denmark",        code: "dk", color: "#C60C30" },
+  { name: "Mikkel Damsgaard",        country: "Denmark",        code: "dk", color: "#C60C30" },
+  { name: "Kasper Schmeichel",       country: "Denmark",        code: "dk", color: "#C60C30" },
+  { name: "Simon Kjær",              country: "Denmark",        code: "dk", color: "#C60C30" },
+  // ── SWITZERLAND ────────────────────────────────────────────────────────────
+  { name: "Granit Xhaka",            country: "Switzerland",    code: "ch", color: "#FF0000" },
+  { name: "Xherdan Shaqiri",         country: "Switzerland",    code: "ch", color: "#FF0000" },
+  { name: "Remo Freuler",            country: "Switzerland",    code: "ch", color: "#FF0000" },
+  { name: "Manuel Akanji",           country: "Switzerland",    code: "ch", color: "#FF0000" },
+  { name: "Yann Sommer",             country: "Switzerland",    code: "ch", color: "#FF0000" },
+  { name: "Breel Embolo",            country: "Switzerland",    code: "ch", color: "#FF0000" },
+  { name: "Noah Okafor",             country: "Switzerland",    code: "ch", color: "#FF0000" },
+  { name: "Ruben Vargas",            country: "Switzerland",    code: "ch", color: "#FF0000" },
+  // ── AUSTRIA ────────────────────────────────────────────────────────────────
+  { name: "David Alaba",             country: "Austria",        code: "at", color: "#ED2939" },
+  { name: "Marcel Sabitzer",         country: "Austria",        code: "at", color: "#ED2939" },
+  { name: "Konrad Laimer",           country: "Austria",        code: "at", color: "#ED2939" },
+  { name: "Marko Arnautović",        country: "Austria",        code: "at", color: "#ED2939" },
+  { name: "Patrick Wimmer",          country: "Austria",        code: "at", color: "#ED2939" },
+  { name: "Christoph Baumgartner",   country: "Austria",        code: "at", color: "#ED2939" },
+  // ── TURKEY ─────────────────────────────────────────────────────────────────
+  { name: "Hakan Çalhanoğlu",        country: "Turkey",         code: "tr", color: "#E30A17" },
+  { name: "Arda Güler",              country: "Turkey",         code: "tr", color: "#E30A17" },
+  { name: "Kenan Yıldız",            country: "Turkey",         code: "tr", color: "#E30A17" },
+  { name: "Merih Demiral",           country: "Turkey",         code: "tr", color: "#E30A17" },
+  { name: "Ferdi Kadıoğlu",          country: "Turkey",         code: "tr", color: "#E30A17" },
+  { name: "Orkun Kökçü",             country: "Turkey",         code: "tr", color: "#E30A17" },
+  { name: "Samet Akaydın",           country: "Turkey",         code: "tr", color: "#E30A17" },
+  // ── UKRAINE ────────────────────────────────────────────────────────────────
+  { name: "Mykhailo Mudryk",         country: "Ukraine",        code: "ua", color: "#005BBB" },
+  { name: "Ruslan Malinovskyi",      country: "Ukraine",        code: "ua", color: "#005BBB" },
+  { name: "Oleksandr Zinchenko",     country: "Ukraine",        code: "ua", color: "#005BBB" },
+  { name: "Viktor Tsygankov",        country: "Ukraine",        code: "ua", color: "#005BBB" },
+  { name: "Georgiy Sudakov",         country: "Ukraine",        code: "ua", color: "#005BBB" },
+  { name: "Artem Dovbyk",            country: "Ukraine",        code: "ua", color: "#005BBB" },
+  // ── HUNGARY ────────────────────────────────────────────────────────────────
+  { name: "Dominik Szoboszlai",      country: "Hungary",        code: "hu", color: "#CE2939" },
+  { name: "Roland Sallai",           country: "Hungary",        code: "hu", color: "#CE2939" },
+  { name: "Péter Gulácsi",           country: "Hungary",        code: "hu", color: "#CE2939" },
+  { name: "Ádám Szalai",             country: "Hungary",        code: "hu", color: "#CE2939" },
+  { name: "Loïc Nego",               country: "Hungary",        code: "hu", color: "#CE2939" },
+  // ── CZECH REPUBLIC ─────────────────────────────────────────────────────────
+  { name: "Tomáš Souček",            country: "Czech Republic", code: "cz", color: "#D7141A" },
+  { name: "Vladimír Coufal",         country: "Czech Republic", code: "cz", color: "#D7141A" },
+  { name: "Patrik Schick",           country: "Czech Republic", code: "cz", color: "#D7141A" },
+  { name: "Ondrej Lingr",            country: "Czech Republic", code: "cz", color: "#D7141A" },
+  // ── SCOTLAND ───────────────────────────────────────────────────────────────
+  { name: "Andrew Robertson",        country: "Scotland",       code: "gb-sct", color: "#003DA5" },
+  { name: "Scott McTominay",         country: "Scotland",       code: "gb-sct", color: "#003DA5" },
+  { name: "Kieran Tierney",          country: "Scotland",       code: "gb-sct", color: "#003DA5" },
+  { name: "John McGinn",             country: "Scotland",       code: "gb-sct", color: "#003DA5" },
+  { name: "Ryan Christie",           country: "Scotland",       code: "gb-sct", color: "#003DA5" },
+  // ── ROMANIA ────────────────────────────────────────────────────────────────
+  { name: "Radu Drăgușin",           country: "Romania",        code: "ro", color: "#002B7F" },
+  { name: "Florinel Coman",          country: "Romania",        code: "ro", color: "#002B7F" },
+  { name: "Nicolae Stanciu",         country: "Romania",        code: "ro", color: "#002B7F" },
+  { name: "Denis Drăguș",            country: "Romania",        code: "ro", color: "#002B7F" },
+  // ── SLOVAKIA ───────────────────────────────────────────────────────────────
+  { name: "Stanislav Lobotka",       country: "Slovakia",       code: "sk", color: "#0B4EA2" },
+  { name: "Ondrej Duda",             country: "Slovakia",       code: "sk", color: "#0B4EA2" },
+  { name: "David Strelec",           country: "Slovakia",       code: "sk", color: "#0B4EA2" },
+  // ── SLOVENIA ───────────────────────────────────────────────────────────────
+  { name: "Jan Oblak",               country: "Slovenia",       code: "si", color: "#003DA5" },
+  { name: "Benjamin Šeško",          country: "Slovenia",       code: "si", color: "#003DA5" },
+  { name: "Josip Ilicic",            country: "Slovenia",       code: "si", color: "#003DA5" },
+  // ── GREECE ─────────────────────────────────────────────────────────────────
+  { name: "Kostas Tsimikas",         country: "Greece",         code: "gr", color: "#0D5EAF" },
+  { name: "Fotis Ioannidis",         country: "Greece",         code: "gr", color: "#0D5EAF" },
+  { name: "Vangelis Pavlidis",       country: "Greece",         code: "gr", color: "#0D5EAF" },
+  // ── WALES ──────────────────────────────────────────────────────────────────
+  { name: "Gareth Bale",             country: "Wales",          code: "gb-wls", color: "#00AB39" },
+  { name: "Aaron Ramsey",            country: "Wales",          code: "gb-wls", color: "#00AB39" },
+  { name: "Ben Davies",              country: "Wales",          code: "gb-wls", color: "#00AB39" },
+  // ── MOROCCO ────────────────────────────────────────────────────────────────
+  { name: "Achraf Hakimi",           country: "Morocco",        code: "ma", color: "#C1272D" },
+  { name: "Hakim Ziyech",            country: "Morocco",        code: "ma", color: "#C1272D" },
+  { name: "Youssef En-Nesyri",       country: "Morocco",        code: "ma", color: "#C1272D" },
+  { name: "Sofyan Amrabat",          country: "Morocco",        code: "ma", color: "#C1272D" },
+  { name: "Azzedine Ounahi",         country: "Morocco",        code: "ma", color: "#C1272D" },
+  { name: "Soufiane Boufal",         country: "Morocco",        code: "ma", color: "#C1272D" },
+  { name: "Romain Saïss",            country: "Morocco",        code: "ma", color: "#C1272D" },
+  { name: "Noussair Mazraoui",       country: "Morocco",        code: "ma", color: "#C1272D" },
+  { name: "Nayef Aguerd",            country: "Morocco",        code: "ma", color: "#C1272D" },
+  { name: "Yassine Bounou",          country: "Morocco",        code: "ma", color: "#C1272D" },
+  { name: "Selim Amallah",           country: "Morocco",        code: "ma", color: "#C1272D" },
+  // ── SENEGAL ────────────────────────────────────────────────────────────────
+  { name: "Sadio Mané",              country: "Senegal",        code: "sn", color: "#00853F" },
+  { name: "Ismaila Sarr",            country: "Senegal",        code: "sn", color: "#00853F" },
+  { name: "Boulaye Dia",             country: "Senegal",        code: "sn", color: "#00853F" },
+  { name: "Kalidou Koulibaly",       country: "Senegal",        code: "sn", color: "#00853F" },
+  { name: "Idrissa Gueye",           country: "Senegal",        code: "sn", color: "#00853F" },
+  { name: "Nicolas Jackson",         country: "Senegal",        code: "sn", color: "#00853F" },
+  { name: "Pape Gueye",              country: "Senegal",        code: "sn", color: "#00853F" },
+  { name: "Nampalys Mendy",          country: "Senegal",        code: "sn", color: "#00853F" },
+  // ── NIGERIA ────────────────────────────────────────────────────────────────
+  { name: "Victor Osimhen",          country: "Nigeria",        code: "ng", color: "#008751" },
+  { name: "Samuel Chukwueze",        country: "Nigeria",        code: "ng", color: "#008751" },
+  { name: "Wilfred Ndidi",           country: "Nigeria",        code: "ng", color: "#008751" },
+  { name: "Kelechi Iheanacho",       country: "Nigeria",        code: "ng", color: "#008751" },
+  { name: "Taiwo Awoniyi",           country: "Nigeria",        code: "ng", color: "#008751" },
+  { name: "Ademola Lookman",         country: "Nigeria",        code: "ng", color: "#008751" },
+  { name: "Alex Iwobi",              country: "Nigeria",        code: "ng", color: "#008751" },
+  { name: "Frank Onyeka",            country: "Nigeria",        code: "ng", color: "#008751" },
+  { name: "Alhassan Yusuf",          country: "Nigeria",        code: "ng", color: "#008751" },
+  // ── EGYPT ──────────────────────────────────────────────────────────────────
+  { name: "Mohamed Salah",           country: "Egypt",          code: "eg", color: "#CE1126" },
+  { name: "Omar Marmoush",           country: "Egypt",          code: "eg", color: "#CE1126" },
+  { name: "Mostafa Mohamed",         country: "Egypt",          code: "eg", color: "#CE1126" },
+  { name: "Mohamed El-Shenawy",      country: "Egypt",          code: "eg", color: "#CE1126" },
+  { name: "Ahmed Hegazy",            country: "Egypt",          code: "eg", color: "#CE1126" },
+  { name: "Amr El-Sulaya",           country: "Egypt",          code: "eg", color: "#CE1126" },
+  // ── GHANA ──────────────────────────────────────────────────────────────────
+  { name: "Thomas Partey",           country: "Ghana",          code: "gh", color: "#006B3F" },
+  { name: "Jordan Ayew",             country: "Ghana",          code: "gh", color: "#006B3F" },
+  { name: "Mohammed Kudus",          country: "Ghana",          code: "gh", color: "#006B3F" },
+  { name: "Antoine Semenyo",         country: "Ghana",          code: "gh", color: "#006B3F" },
+  { name: "Inaki Williams",          country: "Ghana",          code: "gh", color: "#006B3F" },
+  { name: "Abdul Fatawu Issahaku",   country: "Ghana",          code: "gh", color: "#006B3F" },
+  // ── IVORY COAST ────────────────────────────────────────────────────────────
+  { name: "Franck Kessié",           country: "Ivory Coast",    code: "ci", color: "#F77F00" },
+  { name: "Nicolas Pépé",            country: "Ivory Coast",    code: "ci", color: "#F77F00" },
+  { name: "Wilfried Zaha",           country: "Ivory Coast",    code: "ci", color: "#F77F00" },
+  { name: "Sébastien Haller",        country: "Ivory Coast",    code: "ci", color: "#F77F00" },
+  { name: "Ibrahim Sangaré",         country: "Ivory Coast",    code: "ci", color: "#F77F00" },
+  { name: "Amad Diallo",             country: "Ivory Coast",    code: "ci", color: "#F77F00" },
+  { name: "Simon Adingra",           country: "Ivory Coast",    code: "ci", color: "#F77F00" },
+  // ── CAMEROON ───────────────────────────────────────────────────────────────
+  { name: "André Onana",             country: "Cameroon",       code: "cm", color: "#007A5E" },
+  { name: "Vincent Aboubakar",       country: "Cameroon",       code: "cm", color: "#007A5E" },
+  { name: "Karl Toko Ekambi",        country: "Cameroon",       code: "cm", color: "#007A5E" },
+  { name: "Martin Hongla",           country: "Cameroon",       code: "cm", color: "#007A5E" },
+  { name: "Jean-Charles Castelletto",country: "Cameroon",       code: "cm", color: "#007A5E" },
+  // ── SOUTH AFRICA ───────────────────────────────────────────────────────────
+  { name: "Percy Tau",               country: "South Africa",   code: "za", color: "#007A4D" },
+  { name: "Themba Zwane",            country: "South Africa",   code: "za", color: "#007A4D" },
+  { name: "Ronwen Williams",         country: "South Africa",   code: "za", color: "#007A4D" },
+  // ── ALGERIA ────────────────────────────────────────────────────────────────
+  { name: "Riyad Mahrez",            country: "Algeria",        code: "dz", color: "#006233" },
+  { name: "Islam Slimani",           country: "Algeria",        code: "dz", color: "#006233" },
+  { name: "Youcef Atal",             country: "Algeria",        code: "dz", color: "#006233" },
+  { name: "Andy Delort",             country: "Algeria",        code: "dz", color: "#006233" },
+  // ── MALI ───────────────────────────────────────────────────────────────────
+  { name: "Boubacar Traoré",         country: "Mali",           code: "ml", color: "#14B53A" },
+  { name: "Adama Traoré",            country: "Mali",           code: "ml", color: "#14B53A" },
+  { name: "Amadou Haidara",          country: "Mali",           code: "ml", color: "#14B53A" },
+  // ── JAPAN ──────────────────────────────────────────────────────────────────
+  { name: "Kaoru Mitoma",            country: "Japan",          code: "jp", color: "#BC002D" },
+  { name: "Ritsu Doan",              country: "Japan",          code: "jp", color: "#BC002D" },
+  { name: "Daichi Kamada",           country: "Japan",          code: "jp", color: "#BC002D" },
+  { name: "Hiroki Ito",              country: "Japan",          code: "jp", color: "#BC002D" },
+  { name: "Takehiro Tomiyasu",       country: "Japan",          code: "jp", color: "#BC002D" },
+  { name: "Ao Tanaka",               country: "Japan",          code: "jp", color: "#BC002D" },
+  { name: "Takumi Minamino",         country: "Japan",          code: "jp", color: "#BC002D" },
+  { name: "Takefusa Kubo",           country: "Japan",          code: "jp", color: "#BC002D" },
+  { name: "Wataru Endo",             country: "Japan",          code: "jp", color: "#BC002D" },
+  { name: "Yukinari Sugawara",       country: "Japan",          code: "jp", color: "#BC002D" },
+  { name: "Keito Nakamura",          country: "Japan",          code: "jp", color: "#BC002D" },
+  // ── SOUTH KOREA ────────────────────────────────────────────────────────────
+  { name: "Son Heung-min",           country: "South Korea",    code: "kr", color: "#CD2E3A" },
+  { name: "Hwang Hee-chan",          country: "South Korea",    code: "kr", color: "#CD2E3A" },
+  { name: "Lee Kang-in",             country: "South Korea",    code: "kr", color: "#CD2E3A" },
+  { name: "Kim Min-jae",             country: "South Korea",    code: "kr", color: "#CD2E3A" },
+  { name: "Hwang In-beom",           country: "South Korea",    code: "kr", color: "#CD2E3A" },
+  { name: "Cho Gue-sung",            country: "South Korea",    code: "kr", color: "#CD2E3A" },
+  { name: "Kwon Chang-hoon",         country: "South Korea",    code: "kr", color: "#CD2E3A" },
+  { name: "Jung Woo-young",          country: "South Korea",    code: "kr", color: "#CD2E3A" },
+  { name: "Oh Hyeon-gyu",            country: "South Korea",    code: "kr", color: "#CD2E3A" },
+  // ── AUSTRALIA ──────────────────────────────────────────────────────────────
+  { name: "Mathew Leckie",           country: "Australia",      code: "au", color: "#00008B" },
+  { name: "Jackson Irvine",          country: "Australia",      code: "au", color: "#00008B" },
+  { name: "Awer Mabil",              country: "Australia",      code: "au", color: "#00008B" },
+  { name: "Ajdin Hrustic",           country: "Australia",      code: "au", color: "#00008B" },
+  { name: "Nestory Irankunda",       country: "Australia",      code: "au", color: "#00008B" },
+  { name: "Martin Boyle",            country: "Australia",      code: "au", color: "#00008B" },
+  // ── SAUDI ARABIA ───────────────────────────────────────────────────────────
+  { name: "Salem Al-Dawsari",        country: "Saudi Arabia",   code: "sa", color: "#006C35" },
+  { name: "Mohammed Al-Owais",       country: "Saudi Arabia",   code: "sa", color: "#006C35" },
+  { name: "Firas Al-Buraikan",       country: "Saudi Arabia",   code: "sa", color: "#006C35" },
+  { name: "Ali Al-Bulayhi",          country: "Saudi Arabia",   code: "sa", color: "#006C35" },
+  { name: "Abdullah Al-Hamdan",      country: "Saudi Arabia",   code: "sa", color: "#006C35" },
+  { name: "Saleh Al-Shehri",         country: "Saudi Arabia",   code: "sa", color: "#006C35" },
+  // ── IRAN ───────────────────────────────────────────────────────────────────
+  { name: "Mehdi Taremi",            country: "Iran",           code: "ir", color: "#239F40" },
+  { name: "Sardar Azmoun",           country: "Iran",           code: "ir", color: "#239F40" },
+  { name: "Saman Ghoddos",           country: "Iran",           code: "ir", color: "#239F40" },
+  { name: "Alireza Jahanbakhsh",     country: "Iran",           code: "ir", color: "#239F40" },
+  { name: "Ali Beiranvand",          country: "Iran",           code: "ir", color: "#239F40" },
+  { name: "Roozbeh Cheshmi",         country: "Iran",           code: "ir", color: "#239F40" },
+  // ── USA ────────────────────────────────────────────────────────────────────
+  { name: "Christian Pulisic",       country: "USA",            code: "us", color: "#B22234" },
+  { name: "Gio Reyna",               country: "USA",            code: "us", color: "#B22234" },
+  { name: "Weston McKennie",         country: "USA",            code: "us", color: "#B22234" },
+  { name: "Tyler Adams",             country: "USA",            code: "us", color: "#B22234" },
+  { name: "Sergino Dest",            country: "USA",            code: "us", color: "#B22234" },
+  { name: "Yunus Musah",             country: "USA",            code: "us", color: "#B22234" },
+  { name: "Matt Turner",             country: "USA",            code: "us", color: "#B22234" },
+  { name: "Folarin Balogun",         country: "USA",            code: "us", color: "#B22234" },
+  { name: "Tim Weah",                country: "USA",            code: "us", color: "#B22234" },
+  { name: "Malik Tillman",           country: "USA",            code: "us", color: "#B22234" },
+  { name: "Ricardo Pepi",            country: "USA",            code: "us", color: "#B22234" },
+  { name: "Josh Sargent",            country: "USA",            code: "us", color: "#B22234" },
+  { name: "Luca de la Torre",        country: "USA",            code: "us", color: "#B22234" },
+  { name: "Joe Scally",              country: "USA",            code: "us", color: "#B22234" },
+  // ── CANADA ─────────────────────────────────────────────────────────────────
+  { name: "Alphonso Davies",         country: "Canada",         code: "ca", color: "#FF0000" },
+  { name: "Jonathan David",          country: "Canada",         code: "ca", color: "#FF0000" },
+  { name: "Tajon Buchanan",          country: "Canada",         code: "ca", color: "#FF0000" },
+  { name: "Richie Laryea",           country: "Canada",         code: "ca", color: "#FF0000" },
+  { name: "Stephen Eustáquio",       country: "Canada",         code: "ca", color: "#FF0000" },
+  { name: "Jonathan Osorio",         country: "Canada",         code: "ca", color: "#FF0000" },
+  { name: "Cyle Larin",              country: "Canada",         code: "ca", color: "#FF0000" },
+  { name: "Ismaël Koné",             country: "Canada",         code: "ca", color: "#FF0000" },
+  { name: "Alistair Johnston",       country: "Canada",         code: "ca", color: "#FF0000" },
+  // ── MEXICO ─────────────────────────────────────────────────────────────────
+  { name: "Hirving Lozano",          country: "Mexico",         code: "mx", color: "#006847" },
+  { name: "Raúl Jiménez",            country: "Mexico",         code: "mx", color: "#006847" },
+  { name: "Edson Álvarez",           country: "Mexico",         code: "mx", color: "#006847" },
+  { name: "Santiago Giménez",        country: "Mexico",         code: "mx", color: "#006847" },
+  { name: "Alexis Vega",             country: "Mexico",         code: "mx", color: "#006847" },
+  { name: "Uriel Antuna",            country: "Mexico",         code: "mx", color: "#006847" },
+  { name: "Guillermo Ochoa",         country: "Mexico",         code: "mx", color: "#006847" },
+  { name: "Andrés Guardado",         country: "Mexico",         code: "mx", color: "#006847" },
+  { name: "Héctor Herrera",          country: "Mexico",         code: "mx", color: "#006847" },
+  { name: "Carlos Vela",             country: "Mexico",         code: "mx", color: "#006847" },
+  { name: "Roberto Alvarado",        country: "Mexico",         code: "mx", color: "#006847" },
+  { name: "César Montes",            country: "Mexico",         code: "mx", color: "#006847" },
+  // ── URUGUAY ────────────────────────────────────────────────────────────────
+  { name: "Darwin Núñez",            country: "Uruguay",        code: "uy", color: "#5190D5" },
+  { name: "Federico Valverde",       country: "Uruguay",        code: "uy", color: "#5190D5" },
+  { name: "Rodrigo Bentancur",       country: "Uruguay",        code: "uy", color: "#5190D5" },
+  { name: "Ronald Araújo",           country: "Uruguay",        code: "uy", color: "#5190D5" },
+  { name: "Matías Olivera",          country: "Uruguay",        code: "uy", color: "#5190D5" },
+  { name: "Giorgian de Arrascaeta",  country: "Uruguay",        code: "uy", color: "#5190D5" },
+  { name: "Edinson Cavani",          country: "Uruguay",        code: "uy", color: "#5190D5" },
+  { name: "Luis Suárez",             country: "Uruguay",        code: "uy", color: "#5190D5" },
+  { name: "José María Giménez",      country: "Uruguay",        code: "uy", color: "#5190D5" },
+  // ── COLOMBIA ───────────────────────────────────────────────────────────────
+  { name: "Luis Díaz",               country: "Colombia",       code: "co", color: "#FCD116" },
+  { name: "James Rodríguez",         country: "Colombia",       code: "co", color: "#FCD116" },
+  { name: "Jhon Durán",              country: "Colombia",       code: "co", color: "#FCD116" },
+  { name: "Juan Cuadrado",           country: "Colombia",       code: "co", color: "#FCD116" },
+  { name: "Dávinson Sánchez",        country: "Colombia",       code: "co", color: "#FCD116" },
+  { name: "Rafael Santos Borré",     country: "Colombia",       code: "co", color: "#FCD116" },
+  { name: "Cucho Hernández",         country: "Colombia",       code: "co", color: "#FCD116" },
+  { name: "Mateus Uribe",            country: "Colombia",       code: "co", color: "#FCD116" },
+  { name: "Óscar Cortés",            country: "Colombia",       code: "co", color: "#FCD116" },
+  // ── ECUADOR ────────────────────────────────────────────────────────────────
+  { name: "Moisés Caicedo",          country: "Ecuador",        code: "ec", color: "#FFD100" },
+  { name: "Enner Valencia",          country: "Ecuador",        code: "ec", color: "#FFD100" },
+  { name: "Gonzalo Plata",           country: "Ecuador",        code: "ec", color: "#FFD100" },
+  { name: "Piero Hincapié",          country: "Ecuador",        code: "ec", color: "#FFD100" },
+  { name: "Jeremy Sarmiento",        country: "Ecuador",        code: "ec", color: "#FFD100" },
+  { name: "Ángel Mena",              country: "Ecuador",        code: "ec", color: "#FFD100" },
+  // ── PARAGUAY ───────────────────────────────────────────────────────────────
+  { name: "Miguel Almirón",          country: "Paraguay",       code: "py", color: "#D52B1E" },
+  { name: "Julio Enciso",            country: "Paraguay",       code: "py", color: "#D52B1E" },
+  { name: "Antonio Sanabria",        country: "Paraguay",       code: "py", color: "#D52B1E" },
+  { name: "Ángel Romero",            country: "Paraguay",       code: "py", color: "#D52B1E" },
+  // ── CHINA ──────────────────────────────────────────────────────────────────
+  { name: "Wu Lei",                  country: "China",          code: "cn", color: "#DE2910" },
+  { name: "Wang Shangyuan",          country: "China",          code: "cn", color: "#DE2910" },
+  { name: "Zhang Linpeng",           country: "China",          code: "cn", color: "#DE2910" },
+  // ── UZBEKISTAN ─────────────────────────────────────────────────────────────
+  { name: "Eldor Shomurodov",        country: "Uzbekistan",     code: "uz", color: "#1EB53A" },
+  { name: "Jaloliddin Masharipov",   country: "Uzbekistan",     code: "uz", color: "#1EB53A" },
+  { name: "Otabek Shukurov",         country: "Uzbekistan",     code: "uz", color: "#1EB53A" },
+  // ── IRAQ ───────────────────────────────────────────────────────────────────
+  { name: "Ameen Ali",               country: "Iraq",           code: "iq", color: "#007A3D" },
+  { name: "Mohanad Ali",             country: "Iraq",           code: "iq", color: "#007A3D" },
+  { name: "Aimen Hussein",           country: "Iraq",           code: "iq", color: "#007A3D" },
+  // ── QATAR ──────────────────────────────────────────────────────────────────
+  { name: "Akram Afif",              country: "Qatar",          code: "qa", color: "#8D1B3D" },
+  { name: "Almoez Ali",              country: "Qatar",          code: "qa", color: "#8D1B3D" },
+  { name: "Hassan Al-Haydos",        country: "Qatar",          code: "qa", color: "#8D1B3D" },
 ];
 
-// Lấy random avatar
+// Trả về { emoji: <img URL cờ>, name: "Tên (Quốc gia)", color: <hex> }
 function getRandomAnimal() {
-  return ANIMALS[Math.floor(Math.random() * ANIMALS.length)];
+  const p = WC2026_PLAYERS[Math.floor(Math.random() * WC2026_PLAYERS.length)];
+  return {
+    emoji: `https://flagcdn.com/w40/${p.code}.png`,
+    name:  `${p.name} (${p.country})`,
+    color: p.color,
+  };
 }
 
 // Lấy IP thực từ request
 function getClientIP(socket) {
   const headers = socket.handshake.headers;
-  // Kiểm tra các header phổ biến cho proxy/load balancer
   const forwarded = headers["x-forwarded-for"];
-  if (forwarded) {
-    return forwarded.split(",")[0].trim();
-  }
+  if (forwarded) return forwarded.split(",")[0].trim();
   const realIp = headers["x-real-ip"];
-  if (realIp) {
-    return realIp;
-  }
-  // Fallback to socket address
-  return socket.handshake.address
-    .replace("::ffff:", "")
-    .replace("::1", "127.0.0.1");
+  if (realIp) return realIp;
+  return socket.handshake.address.replace("::ffff:", "").replace("::1", "127.0.0.1");
 }
 
 // Phân tích User-Agent để xác định thiết bị
 function parseUserAgent(ua) {
   if (!ua) return { device: "Unknown", icon: "💻" };
-
   const uaLower = ua.toLowerCase();
-
-  // iPhone models
-  if (uaLower.includes("iphone")) {
-    if (ua.includes("iPhone14,2") || ua.includes("iPhone 13 Pro"))
-      return { device: "iPhone 13 Pro", icon: "📱" };
-    if (ua.includes("iPhone14,3") || ua.includes("iPhone 13 Pro Max"))
-      return { device: "iPhone 13 Pro Max", icon: "📱" };
-    if (ua.includes("iPhone15") || uaLower.includes("iphone 14"))
-      return { device: "iPhone 14", icon: "📱" };
-    if (ua.includes("iPhone16") || uaLower.includes("iphone 15"))
-      return { device: "iPhone 15", icon: "📱" };
-    return { device: "iPhone", icon: "📱" };
-  }
-
-  // iPad
-  if (uaLower.includes("ipad")) {
-    if (uaLower.includes("ipad pro")) return { device: "iPad Pro", icon: "📱" };
-    return { device: "iPad", icon: "📱" };
-  }
-
-  // Android devices
-  if (uaLower.includes("android")) {
-    // Samsung
-    if (uaLower.includes("samsung") || uaLower.includes("sm-")) {
-      if (uaLower.includes("sm-s9") || uaLower.includes("galaxy s23"))
-        return { device: "Samsung Galaxy S23", icon: "📱" };
-      if (uaLower.includes("sm-s8") || uaLower.includes("galaxy s22"))
-        return { device: "Samsung Galaxy S22", icon: "📱" };
-      if (uaLower.includes("galaxy"))
-        return { device: "Samsung Galaxy", icon: "📱" };
-      return { device: "Samsung", icon: "📱" };
-    }
-    // Xiaomi
-    if (
-      uaLower.includes("xiaomi") ||
-      uaLower.includes("redmi") ||
-      uaLower.includes("poco")
-    ) {
-      if (uaLower.includes("redmi"))
-        return { device: "Xiaomi Redmi", icon: "📱" };
-      if (uaLower.includes("poco"))
-        return { device: "Xiaomi POCO", icon: "📱" };
-      return { device: "Xiaomi", icon: "📱" };
-    }
-    // OPPO
-    if (uaLower.includes("oppo")) return { device: "OPPO", icon: "📱" };
-    // Vivo
-    if (uaLower.includes("vivo")) return { device: "Vivo", icon: "📱" };
-    // Huawei
-    if (uaLower.includes("huawei")) return { device: "Huawei", icon: "📱" };
-    // OnePlus
-    if (uaLower.includes("oneplus")) return { device: "OnePlus", icon: "📱" };
-    // Google Pixel
-    if (uaLower.includes("pixel"))
-      return { device: "Google Pixel", icon: "📱" };
-
-    // Generic Android với tablet check
-    if (
-      uaLower.includes("tablet") ||
-      (uaLower.includes("android") && !uaLower.includes("mobile"))
-    ) {
-      return { device: "Android Tablet", icon: "📱" };
-    }
-    return { device: "Android", icon: "📱" };
-  }
-
-  // macOS
-  if (uaLower.includes("macintosh") || uaLower.includes("mac os")) {
-    if (uaLower.includes("mac os x 10_15") || uaLower.includes("macos 10.15"))
-      return { device: "MacBook (Catalina)", icon: "💻" };
-    if (uaLower.includes("mac os x 11") || uaLower.includes("macos 11"))
-      return { device: "MacBook (Big Sur)", icon: "💻" };
-    if (uaLower.includes("mac os x 12") || uaLower.includes("macos 12"))
-      return { device: "MacBook (Monterey)", icon: "💻" };
-    if (uaLower.includes("mac os x 13") || uaLower.includes("macos 13"))
-      return { device: "MacBook (Ventura)", icon: "💻" };
-    if (uaLower.includes("mac os x 14") || uaLower.includes("macos 14"))
-      return { device: "MacBook (Sonoma)", icon: "💻" };
-    return { device: "Mac", icon: "💻" };
-  }
-
-  // Windows
-  if (uaLower.includes("windows")) {
-    if (uaLower.includes("windows nt 10.0")) {
-      if (uaLower.includes("win64") || uaLower.includes("wow64"))
-        return { device: "Windows 10/11 PC", icon: "🖥️" };
-      return { device: "Windows 10/11", icon: "🖥️" };
-    }
-    if (uaLower.includes("windows nt 6.3"))
-      return { device: "Windows 8.1", icon: "🖥️" };
-    if (uaLower.includes("windows nt 6.1"))
-      return { device: "Windows 7", icon: "🖥️" };
-    return { device: "Windows PC", icon: "🖥️" };
-  }
-
-  // Linux
-  if (uaLower.includes("linux")) {
-    if (uaLower.includes("ubuntu"))
-      return { device: "Ubuntu Linux", icon: "🐧" };
-    if (uaLower.includes("fedora"))
-      return { device: "Fedora Linux", icon: "🐧" };
-    return { device: "Linux", icon: "🐧" };
-  }
-
-  // Chrome OS
-  if (uaLower.includes("cros")) return { device: "Chromebook", icon: "💻" };
-
-  return { device: "Unknown Device", icon: "💻" };
+  if (uaLower.includes("iphone"))   return { device: "iPhone",      icon: "📱" };
+  if (uaLower.includes("ipad"))     return { device: "iPad",        icon: "📱" };
+  if (uaLower.includes("android") && (uaLower.includes("samsung") || uaLower.includes("sm-")))
+                                    return { device: "Samsung",     icon: "📱" };
+  if (uaLower.includes("android") && (uaLower.includes("xiaomi") || uaLower.includes("redmi")))
+                                    return { device: "Xiaomi",      icon: "📱" };
+  if (uaLower.includes("android"))  return { device: "Android",     icon: "📱" };
+  if (uaLower.includes("macintosh"))return { device: "Mac",         icon: "💻" };
+  if (uaLower.includes("windows"))  return { device: "Windows PC",  icon: "🖥️" };
+  if (uaLower.includes("linux"))    return { device: "Linux",       icon: "🐧" };
+  if (uaLower.includes("cros"))     return { device: "Chromebook",  icon: "💻" };
+  return { device: "Unknown", icon: "💻" };
 }
 
 // Tạo ID ngắn gọn cho peer
@@ -253,10 +555,4 @@ function formatBytes(bytes) {
   return parseFloat((bytes / Math.pow(k, i)).toFixed(2)) + " " + sizes[i];
 }
 
-module.exports = {
-  getRandomAnimal,
-  getClientIP,
-  parseUserAgent,
-  generatePeerId,
-  formatBytes,
-};
+module.exports = { getRandomAnimal, getClientIP, parseUserAgent, generatePeerId, formatBytes };

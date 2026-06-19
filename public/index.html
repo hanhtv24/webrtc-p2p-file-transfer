@@ -3,63 +3,148 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>P2P Transfer — WebRTC File Sharing</title>
+  <title>WC2026 P2P Transfer — WebRTC File Sharing</title>
 
-  <!-- Fonts -->
   <link rel="preconnect" href="https://fonts.googleapis.com">
-  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
 
-  <!-- Socket.io -->
   <script src="/socket.io/socket.io.js"></script>
 
   <style>
-    /* ── Reset & Base ──────────────────────────────────────────────────── */
     *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
 
+    /* ── DARK: Night Stadium ─────────────────────────────────────────────── */
     :root {
-      --bg:       #0d1117;
-      --surface:  #161b22;
-      --surface2: #1c2330;
-      --border:   #30363d;
-      --border2:  #21262d;
-      --text:     #e6edf3;
-      --text2:    #8b949e;
-      --text3:    #484f58;
-      --blue:     #58a6ff;
-      --blue-dim: #1f3e6e;
-      --green:    #3fb950;
-      --green-dim:#1a3a24;
-      --red:      #f85149;
-      --red-dim:  #3d1a1a;
-      --orange:   #d29922;
-      --purple:   #a371f7;
-      --mono:     'JetBrains Mono', monospace;
+      --bg:        #020817;
+      --surface:   #08112b;
+      --surface2:  #0d1b3e;
+      --border:    #1a2e55;
+      --border2:   #142240;
+      --text:      #e8f0ff;
+      --text2:     #6b8ab5;
+      --text3:     #334d73;
+      --gold:      #f5a623;
+      --gold-dim:  #1e1200;
+      --gold-glow: rgba(245,166,35,.18);
+      --green:     #22c55e;
+      --green-dim: #041a0e;
+      --red:       #ef4444;
+      --red-dim:   #220a0a;
+      --blue:      #3b82f6;
+      --blue-dim:  #0c1e45;
+      --orange:    #f59e0b;
+      --purple:    #a855f7;
+      --mono:      'JetBrains Mono', monospace;
+      /* aliases expected by app.js chunk map */
+      --border-color: #1a2e55;
     }
 
-    /* ── Light theme ───────────────────────────────────────────────────── */
+    /* ── LIGHT: Stadium Day ─────────────────────────────────────────────── */
     [data-theme="light"] {
-      --bg:       #ffffff;
-      --surface:  #f6f8fa;
-      --surface2: #eaeef2;
-      --border:   #d0d7de;
-      --border2:  #d8dee4;
-      --text:     #1f2328;
-      --text2:    #656d76;
-      --text3:    #9198a1;
-      --blue:     #0969da;
-      --blue-dim: #ddf4ff;
-      --green:    #1a7f37;
-      --green-dim:#dafbe1;
-      --red:      #d1242f;
-      --red-dim:  #fff0f0;
-      --orange:   #9a6700;
+      --bg:        #f4f6fb;
+      --surface:   #ffffff;
+      --surface2:  #eef1f8;
+      --border:    #d0daea;
+      --border2:   #dde4f0;
+      --text:      #0d1b3e;
+      --text2:     #4a6080;
+      --text3:     #9aaac0;
+      --gold:      #d48a00;
+      --gold-dim:  #fff8e7;
+      --gold-glow: rgba(212,138,0,.12);
+      --green:     #16a34a;
+      --green-dim: #f0fdf4;
+      --red:       #dc2626;
+      --red-dim:   #fff1f1;
+      --blue:      #2563eb;
+      --blue-dim:  #eff6ff;
+      --orange:    #d97706;
     }
 
-    /* ── Theme toggle button ───────────────────────────────────────────── */
+    html, body { height: 100%; }
+
+    body {
+      background: var(--bg);
+      color: var(--text);
+      font-family: 'Inter', system-ui, sans-serif;
+      font-size: 14px;
+      line-height: 1.5;
+    }
+
+    /* ── Subtle hex-grid background ─────────────────────────────────────── */
+    body::before {
+      content: '';
+      position: fixed; inset: 0;
+      background-image:
+        repeating-linear-gradient(
+          60deg,
+          transparent,
+          transparent 28px,
+          rgba(245,166,35,.03) 28px,
+          rgba(245,166,35,.03) 29px
+        ),
+        repeating-linear-gradient(
+          -60deg,
+          transparent,
+          transparent 28px,
+          rgba(245,166,35,.03) 28px,
+          rgba(245,166,35,.03) 29px
+        );
+      pointer-events: none; z-index: 0;
+    }
+    #app { position: relative; z-index: 1; display: flex; flex-direction: column; height: 100vh; }
+
+    /* ── Header ─────────────────────────────────────────────────────────── */
+    header {
+      flex-shrink: 0;
+      background: linear-gradient(90deg, #020c20 0%, #071228 60%, #020c20 100%);
+      border-bottom: 2px solid var(--gold);
+      padding: 0 20px;
+      display: flex;
+      align-items: center;
+      gap: 16px;
+      height: 56px;
+      box-shadow: 0 2px 24px rgba(245,166,35,.12);
+    }
+
+    .logo { display: flex; align-items: center; gap: 12px; }
+    .logo-icon {
+      width: 36px; height: 36px;
+      background: linear-gradient(135deg, #f5a623, #e07b00);
+      border-radius: 10px;
+      display: flex; align-items: center; justify-content: center;
+      box-shadow: 0 0 12px rgba(245,166,35,.4);
+      font-size: 20px;
+      flex-shrink: 0;
+    }
+    .logo-title {
+      font-size: 15px; font-weight: 800;
+      letter-spacing: .04em;
+      background: linear-gradient(90deg, #f5a623, #ffd580);
+      -webkit-background-clip: text; -webkit-text-fill-color: transparent;
+    }
+    .logo-sub { font-size: 10px; color: var(--text2); letter-spacing: .08em; text-transform: uppercase; }
+
+    /* WC2026 badge */
+    .wc-badge {
+      display: flex; align-items: center; gap: 6px;
+      padding: 4px 10px;
+      background: linear-gradient(90deg, rgba(245,166,35,.1), rgba(245,166,35,.05));
+      border: 1px solid rgba(245,166,35,.3);
+      border-radius: 20px;
+      font-size: 10px; font-weight: 700;
+      letter-spacing: .1em; text-transform: uppercase;
+      color: var(--gold);
+    }
+    .wc-badge-dot { width: 5px; height: 5px; border-radius: 50%; background: var(--gold); animation: pulse 2s infinite; }
+
+    .header-spacer { flex: 1; }
+
+    /* Theme toggle */
     #theme-toggle {
       display: flex; align-items: center;
       gap: 2px;
-      background: var(--surface2);
+      background: rgba(255,255,255,.05);
       border: 1px solid var(--border);
       border-radius: 8px;
       padding: 3px;
@@ -74,48 +159,12 @@
       font-size: 14px;
     }
     .theme-btn:hover  { background: var(--border); color: var(--text); }
-    .theme-btn.active { background: var(--bg); color: var(--text); box-shadow: 0 1px 3px rgba(0,0,0,.15); }
-
-    html, body { height: 100%; }
-
-    body {
-      background: var(--bg);
-      color: var(--text);
-      font-family: 'Inter', system-ui, sans-serif;
-      font-size: 14px;
-      line-height: 1.5;
-    }
-
-    /* ── Layout ────────────────────────────────────────────────────────── */
-    #app { display: flex; flex-direction: column; height: 100vh; }
-
-    header {
-      flex-shrink: 0;
-      background: var(--surface);
-      border-bottom: 1px solid var(--border);
-      padding: 10px 20px;
-      display: flex;
-      align-items: center;
-      gap: 16px;
-    }
-
-    .logo { display: flex; align-items: center; gap: 10px; }
-    .logo-icon {
-      width: 32px; height: 32px;
-      background: linear-gradient(135deg, var(--blue), var(--purple));
-      border-radius: 8px;
-      display: flex; align-items: center; justify-content: center;
-    }
-    .logo-icon svg { width: 18px; height: 18px; color: #fff; }
-    .logo-title { font-size: 15px; font-weight: 600; color: var(--text); }
-    .logo-sub   { font-size: 11px; color: var(--text2); }
-
-    .header-spacer { flex: 1; }
+    .theme-btn.active { background: rgba(245,166,35,.15); color: var(--gold); box-shadow: 0 0 8px rgba(245,166,35,.2); }
 
     .badge {
       display: flex; align-items: center; gap: 6px;
-      padding: 4px 10px;
-      background: var(--surface2);
+      padding: 5px 12px;
+      background: rgba(255,255,255,.04);
       border: 1px solid var(--border);
       border-radius: 6px;
       font-family: var(--mono);
@@ -125,34 +174,48 @@
       width: 6px; height: 6px; border-radius: 50%;
       background: var(--green);
       animation: pulse 2s infinite;
+      box-shadow: 0 0 6px var(--green);
     }
     @keyframes pulse { 0%,100%{opacity:1} 50%{opacity:.4} }
 
-    /* ── Stats bar ─────────────────────────────────────────────────────── */
+    /* ── Stats bar — Scoreboard ──────────────────────────────────────────── */
     #stats-bar {
       flex-shrink: 0;
-      background: var(--surface2);
-      border-bottom: 1px solid var(--border2);
-      padding: 6px 20px;
-      display: flex; gap: 24px;
+      background: linear-gradient(90deg, #030f24, #071428, #030f24);
+      border-bottom: 1px solid var(--border);
+      padding: 0 20px;
+      display: flex; gap: 0;
+      height: 40px; align-items: center;
     }
-    .stat { display: flex; align-items: center; gap: 6px; }
-    .stat-label { font-size: 11px; color: var(--text2); text-transform: uppercase; letter-spacing: .05em; }
-    .stat-value { font-size: 12px; font-weight: 600; font-family: var(--mono); color: var(--text); }
-    .stat-value.blue   { color: var(--blue); }
-    .stat-value.green  { color: var(--green); }
-    .stat-value.orange { color: var(--orange); }
+    .stat {
+      display: flex; align-items: center; gap: 8px;
+      padding: 0 18px;
+      border-right: 1px solid var(--border2);
+    }
+    .stat:first-child { padding-left: 0; }
+    .stat:last-child  { border-right: none; }
+    .stat-label {
+      font-size: 10px; color: var(--text3);
+      text-transform: uppercase; letter-spacing: .08em; font-weight: 600;
+    }
+    .stat-value {
+      font-size: 13px; font-weight: 700; font-family: var(--mono);
+      color: var(--text);
+    }
+    .stat-value.blue   { color: #60a5fa; }
+    .stat-value.green  { color: var(--green); text-shadow: 0 0 8px rgba(34,197,94,.4); }
+    .stat-value.orange { color: var(--gold); text-shadow: 0 0 8px rgba(245,166,35,.4); }
 
-    /* ── Main 3-column grid ────────────────────────────────────────────── */
+    /* ── Main 3-column grid ──────────────────────────────────────────────── */
     #main {
       flex: 1; overflow: hidden;
       display: grid;
-      grid-template-columns: 260px 1fr 280px;
-      gap: 0;
+      grid-template-columns: 270px 1fr 288px;
     }
 
-    /* ── Sidebar (peers) ───────────────────────────────────────────────── */
+    /* ── Sidebar — Squad List ────────────────────────────────────────────── */
     #sidebar {
+      background: var(--surface);
       border-right: 1px solid var(--border);
       display: flex; flex-direction: column;
       overflow: hidden;
@@ -162,22 +225,28 @@
       padding: 12px 16px;
       border-bottom: 1px solid var(--border2);
       display: flex; align-items: center; gap: 8px;
+      background: linear-gradient(180deg, var(--surface2) 0%, var(--surface) 100%);
     }
-    .panel-header h2 { font-size: 13px; font-weight: 600; flex: 1; }
+    .panel-header h2 {
+      font-size: 11px; font-weight: 700; flex: 1;
+      text-transform: uppercase; letter-spacing: .1em;
+      color: var(--text2);
+    }
     .count-badge {
-      font-size: 11px; font-family: var(--mono);
-      background: var(--blue-dim); color: var(--blue);
-      padding: 1px 7px; border-radius: 12px;
+      font-size: 11px; font-family: var(--mono); font-weight: 700;
+      background: var(--gold-dim); color: var(--gold);
+      border: 1px solid rgba(245,166,35,.25);
+      padding: 2px 8px; border-radius: 20px;
     }
 
     .connect-row {
-      padding: 12px 16px;
+      padding: 10px 12px;
       border-bottom: 1px solid var(--border2);
       display: flex; gap: 8px;
+      background: var(--surface);
     }
     .input-mono {
-      flex: 1;
-      min-width: 0;
+      flex: 1; min-width: 0;
       background: var(--bg);
       border: 1px solid var(--border);
       color: var(--text);
@@ -188,52 +257,96 @@
       text-transform: uppercase;
       letter-spacing: .1em;
       outline: none;
-      transition: border-color .15s;
+      transition: border-color .15s, box-shadow .15s;
     }
-    .input-mono:focus { border-color: var(--blue); }
+    .input-mono:focus {
+      border-color: var(--gold);
+      box-shadow: 0 0 0 3px rgba(245,166,35,.1);
+    }
     .input-mono::placeholder { color: var(--text3); text-transform: none; letter-spacing: 0; }
 
     .btn {
       padding: 7px 14px;
       border: none; cursor: pointer;
       border-radius: 6px;
-      font-size: 13px; font-weight: 500;
+      font-size: 13px; font-weight: 600;
       white-space: nowrap;
-      transition: filter .15s, opacity .15s;
+      transition: filter .15s, opacity .15s, box-shadow .15s;
     }
-    .btn:hover { filter: brightness(1.1); }
+    .btn:hover  { filter: brightness(1.12); }
     .btn:active { opacity: .8; }
-    .btn-primary { background: var(--blue); color: #fff; }
-    .btn-danger  { background: var(--red-dim); color: var(--red); border: 1px solid #5a1e1e; }
+    .btn-primary {
+      background: linear-gradient(135deg, #f5a623, #e07b00);
+      color: #000;
+      box-shadow: 0 2px 8px rgba(245,166,35,.3);
+    }
+    .btn-primary:hover { box-shadow: 0 4px 16px rgba(245,166,35,.5); }
+    .btn-danger  { background: var(--red-dim); color: var(--red); border: 1px solid rgba(239,68,68,.2); }
     .btn-ghost   { background: var(--surface2); color: var(--text2); border: 1px solid var(--border); }
 
-    #peers-list {
-      flex: 1; overflow-y: auto; padding: 8px;
-    }
+    #peers-list { flex: 1; overflow-y: auto; padding: 8px; }
 
+    /* Player card */
     .peer-item {
       display: flex; align-items: center; gap: 10px;
-      padding: 8px 10px; border-radius: 6px;
+      padding: 9px 10px; border-radius: 8px;
       cursor: pointer;
       border: 1px solid transparent;
-      transition: background .1s, border-color .1s;
-      margin-bottom: 2px;
+      transition: background .15s, border-color .15s, box-shadow .15s;
+      margin-bottom: 3px;
     }
-    .peer-item:hover  { background: var(--surface2); border-color: var(--border2); }
-    .peer-item.active { background: var(--blue-dim); border-color: var(--blue); }
+    .peer-item:hover  {
+      background: var(--surface2);
+      border-color: var(--border);
+    }
+    .peer-item.active {
+      background: linear-gradient(90deg, rgba(245,166,35,.08), transparent);
+      border-color: rgba(245,166,35,.35);
+      box-shadow: 0 0 12px rgba(245,166,35,.08);
+    }
 
-    .peer-emoji { font-size: 20px; flex-shrink: 0; }
+    .peer-avatar {
+      width: 32px; height: 32px;
+      border-radius: 6px; overflow: hidden;
+      background: var(--surface2);
+      display: flex; align-items: center; justify-content: center;
+      flex-shrink: 0;
+      border: 1px solid var(--border);
+      transition: border-color .15s;
+    }
+    .peer-item.active .peer-avatar { border-color: var(--gold); }
+    .peer-avatar img { width: 100%; height: 100%; object-fit: cover; }
+
+    .peer-emoji { font-size: 18px; flex-shrink: 0; }
     .peer-info  { flex: 1; min-width: 0; }
-    .peer-name  { font-size: 13px; font-weight: 500; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
-    .peer-id    { font-size: 11px; font-family: var(--mono); color: var(--text2); }
-    .peer-online { width: 6px; height: 6px; border-radius: 50%; background: var(--green); flex-shrink: 0; }
-    .peer-connected { width: 6px; height: 6px; border-radius: 50%; background: var(--blue); flex-shrink: 0; box-shadow: 0 0 6px var(--blue); }
+    .peer-name  {
+      font-size: 12px; font-weight: 600;
+      white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
+    }
+    .peer-id {
+      font-size: 10px; font-family: var(--mono); color: var(--text2);
+    }
+    .peer-online {
+      width: 7px; height: 7px; border-radius: 50%;
+      background: var(--green); flex-shrink: 0;
+      box-shadow: 0 0 6px var(--green);
+    }
+    .peer-connected {
+      width: 7px; height: 7px; border-radius: 50%;
+      background: var(--gold); flex-shrink: 0;
+      box-shadow: 0 0 8px var(--gold);
+      animation: pulse 1.5s infinite;
+    }
 
-    .no-peers { text-align: center; padding: 32px 12px; color: var(--text2); font-size: 12px; }
+    .no-peers {
+      text-align: center; padding: 40px 12px;
+      color: var(--text3); font-size: 12px;
+    }
+    .no-peers-icon { font-size: 32px; margin-bottom: 10px; opacity: .4; }
 
     .btn-disconnect {
       background: none; border: none; cursor: pointer;
-      color: var(--text3); font-size: 13px;
+      color: var(--text3); font-size: 12px;
       width: 22px; height: 22px; border-radius: 4px;
       display: flex; align-items: center; justify-content: center;
       flex-shrink: 0;
@@ -241,72 +354,111 @@
     }
     .btn-disconnect:hover { background: var(--red-dim); color: var(--red); }
 
-    /* ── Center: transfers ─────────────────────────────────────────────── */
+    /* Name editor */
+    .name-edit {
+      display: flex; gap: 6px; padding: 10px 12px;
+      border-top: 1px solid var(--border2);
+      flex-shrink: 0;
+    }
+    .name-input {
+      flex: 1; background: var(--bg); border: 1px solid var(--border);
+      color: var(--text); font-size: 13px; padding: 5px 8px;
+      border-radius: 5px; outline: none;
+    }
+    .name-input:focus { border-color: var(--gold); }
+
+    /* ── Center — Match Center ───────────────────────────────────────────── */
     #center {
       display: flex; flex-direction: column; overflow: hidden;
+      background: var(--bg);
     }
-
     .center-body {
       flex: 1; overflow-y: auto;
       padding: 16px;
-      display: flex; flex-direction: column; gap: 16px;
+      display: flex; flex-direction: column; gap: 14px;
     }
 
-    /* Drop zone */
+    /* Drop zone — football pitch feel */
     #drop-zone {
-      border: 2px dashed var(--border);
-      border-radius: 10px;
-      padding: 32px;
+      border: 2px dashed rgba(245,166,35,.35);
+      border-radius: 14px;
+      padding: 36px 32px;
       text-align: center;
       cursor: pointer;
-      transition: border-color .2s, background .2s;
+      transition: border-color .2s, background .2s, box-shadow .2s;
+      background: radial-gradient(ellipse at center, rgba(245,166,35,.04) 0%, transparent 70%);
+      position: relative; overflow: hidden;
+    }
+    #drop-zone::before {
+      content: '';
+      position: absolute; inset: 0;
+      background:
+        radial-gradient(circle at 50% 50%, rgba(34,197,94,.05) 0%, transparent 60%),
+        repeating-linear-gradient(90deg, transparent, transparent 40px, rgba(34,197,94,.02) 40px, rgba(34,197,94,.02) 41px);
+      pointer-events: none;
     }
     #drop-zone:hover, #drop-zone.dragover {
-      border-color: var(--blue);
-      background: var(--blue-dim);
+      border-color: var(--gold);
+      background: radial-gradient(ellipse at center, rgba(245,166,35,.08) 0%, transparent 70%);
+      box-shadow: 0 0 30px rgba(245,166,35,.1), inset 0 0 30px rgba(245,166,35,.04);
     }
     #drop-zone.hidden { display: none; }
-    .drop-icon { font-size: 36px; margin-bottom: 8px; }
-    .drop-title { font-size: 15px; font-weight: 600; margin-bottom: 4px; }
+    .drop-icon { font-size: 40px; margin-bottom: 10px; }
+    .drop-title { font-size: 15px; font-weight: 700; margin-bottom: 6px; }
     .drop-sub   { font-size: 12px; color: var(--text2); }
 
     /* Transfer card */
     .transfer-card {
       background: var(--surface);
       border: 1px solid var(--border2);
-      border-radius: 10px;
+      border-radius: 12px;
       overflow: hidden;
+      box-shadow: 0 2px 12px rgba(0,0,0,.3);
     }
     .transfer-card-header {
-      padding: 12px 14px;
+      padding: 11px 14px;
       display: flex; align-items: center; gap: 10px;
       border-bottom: 1px solid var(--border2);
+      background: linear-gradient(90deg, var(--surface2), var(--surface));
     }
     .transfer-direction {
-      font-size: 10px; font-weight: 600;
-      padding: 2px 7px; border-radius: 4px;
-      text-transform: uppercase; letter-spacing: .06em;
+      font-size: 10px; font-weight: 700;
+      padding: 2px 8px; border-radius: 20px;
+      text-transform: uppercase; letter-spacing: .08em;
     }
-    .direction-sending   { background: var(--blue-dim); color: var(--blue); }
-    .direction-receiving { background: var(--green-dim); color: var(--green); }
+    .direction-sending   {
+      background: rgba(245,166,35,.12); color: var(--gold);
+      border: 1px solid rgba(245,166,35,.25);
+    }
+    .direction-receiving {
+      background: rgba(34,197,94,.1); color: var(--green);
+      border: 1px solid rgba(34,197,94,.2);
+    }
 
-    .transfer-filename { font-size: 14px; font-weight: 500; flex: 1; min-width: 0; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
-    .transfer-peer     { font-size: 12px; font-family: var(--mono); color: var(--text2); }
+    .transfer-filename {
+      font-size: 13px; font-weight: 600; flex: 1; min-width: 0;
+      white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
+    }
+    .transfer-peer { font-size: 11px; font-family: var(--mono); color: var(--text2); }
 
     .transfer-body { padding: 12px 14px; }
 
     /* Progress bar */
     .progress-track {
-      height: 6px; background: var(--border);
+      height: 5px;
+      background: var(--border);
       border-radius: 3px; margin-bottom: 8px;
       overflow: hidden;
     }
-    .progress-fill {
-      height: 100%; border-radius: 3px;
-      transition: width .3s ease;
+    .progress-fill { height: 100%; border-radius: 3px; transition: width .3s ease; }
+    .progress-fill.sending   {
+      background: linear-gradient(90deg, #f5a623, #ffd580);
+      box-shadow: 0 0 8px rgba(245,166,35,.6);
     }
-    .progress-fill.sending   { background: var(--blue); }
-    .progress-fill.receiving { background: var(--green); }
+    .progress-fill.receiving {
+      background: linear-gradient(90deg, #22c55e, #4ade80);
+      box-shadow: 0 0 8px rgba(34,197,94,.5);
+    }
 
     .transfer-stats {
       display: flex; justify-content: space-between;
@@ -316,51 +468,52 @@
 
     /* Chunk map */
     .chunk-map-label {
-      font-size: 11px; color: var(--text2);
-      margin-bottom: 6px;
+      font-size: 10px; color: var(--text3);
+      text-transform: uppercase; letter-spacing: .08em;
+      margin-bottom: 6px; font-weight: 600;
     }
-    .chunk-map {
-      display: flex; flex-wrap: wrap; gap: 2px;
-    }
+    .chunk-map { display: flex; flex-wrap: wrap; gap: 2px; }
     .chunk-cell {
       width: 10px; height: 10px; border-radius: 2px;
       background: var(--border);
-      transition: background .1s;
+      transition: background .12s;
     }
-    .chunk-cell.ok  { background: var(--green); }
-    .chunk-cell.bad { background: var(--red); }
-    .chunk-cell.in  { background: var(--orange); animation: blink .6s infinite; }
-    @keyframes blink { 0%,100%{opacity:1} 50%{opacity:.4} }
+    .chunk-cell.ok  { background: var(--green); box-shadow: 0 0 4px rgba(34,197,94,.4); }
+    .chunk-cell.bad { background: var(--red); box-shadow: 0 0 4px rgba(239,68,68,.4); }
+    .chunk-cell.in  { background: var(--gold); animation: blink .5s infinite; }
+    @keyframes blink { 0%,100%{opacity:1} 50%{opacity:.3} }
 
     /* Hash verify badge */
     .hash-badge {
-      display: inline-flex; align-items: center; gap: 5px;
+      display: inline-flex; align-items: center; gap: 6px;
       font-size: 11px; font-family: var(--mono);
-      padding: 3px 8px; border-radius: 4px; margin-top: 8px;
+      padding: 3px 10px; border-radius: 20px; margin-top: 8px;
+      font-weight: 600;
     }
-    .hash-ok  { background: var(--green-dim); color: var(--green); }
-    .hash-bad { background: var(--red-dim); color: var(--red); }
+    .hash-ok  { background: rgba(34,197,94,.1); color: var(--green); border: 1px solid rgba(34,197,94,.2); }
+    .hash-bad { background: var(--red-dim); color: var(--red); border: 1px solid rgba(239,68,68,.2); }
 
     /* Received files */
     .file-row {
       display: flex; align-items: center; gap: 10px;
       padding: 8px 12px;
       background: var(--surface2);
-      border-radius: 6px; margin-bottom: 4px;
+      border: 1px solid var(--border2);
+      border-radius: 8px; margin-bottom: 4px;
     }
-    .file-emoji { font-size: 20px; flex-shrink: 0; }
+    .file-emoji { font-size: 18px; flex-shrink: 0; }
     .file-info  { flex: 1; min-width: 0; }
     .file-name  { font-size: 13px; font-weight: 500; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
     .file-meta  { font-size: 11px; font-family: var(--mono); color: var(--text2); }
     .btn-dl {
-      padding: 4px 10px;
-      background: var(--green-dim); color: var(--green);
-      border: 1px solid var(--green-dim);
-      border-radius: 5px; cursor: pointer; font-size: 12px;
+      padding: 4px 12px;
+      background: rgba(34,197,94,.1); color: var(--green);
+      border: 1px solid rgba(34,197,94,.2);
+      border-radius: 20px; cursor: pointer; font-size: 11px; font-weight: 600;
       white-space: nowrap;
-      transition: filter .15s;
+      transition: filter .15s, box-shadow .15s;
     }
-    .btn-dl:hover { filter: brightness(1.2); }
+    .btn-dl:hover { filter: brightness(1.15); box-shadow: 0 0 8px rgba(34,197,94,.3); }
 
     /* Empty state */
     #empty-state {
@@ -368,29 +521,31 @@
       align-items: center; justify-content: center;
       color: var(--text2); text-align: center; padding: 40px;
     }
-    #empty-state .empty-icon { font-size: 48px; margin-bottom: 16px; opacity: .5; }
-    #empty-state h3 { font-size: 16px; font-weight: 600; margin-bottom: 8px; color: var(--text); }
-    #empty-state p  { font-size: 13px; max-width: 280px; }
+    #empty-state .empty-icon { font-size: 56px; margin-bottom: 16px; opacity: .4; }
+    #empty-state h3 { font-size: 18px; font-weight: 700; margin-bottom: 8px; color: var(--text); }
+    #empty-state p  { font-size: 13px; max-width: 280px; color: var(--text2); }
 
-    /* ── Right panel: my files ─────────────────────────────────────────── */
+    /* ── Right panel — Files ──────────────────────────────────────────────── */
     #right-panel {
+      background: var(--surface);
       border-left: 1px solid var(--border);
       display: flex; flex-direction: column; overflow: hidden;
     }
-
     .right-body { flex: 1; overflow-y: auto; padding: 10px; }
 
     .my-file-row {
       display: flex; align-items: center; gap: 8px;
       padding: 8px 10px;
       background: var(--surface2);
-      border-radius: 6px; margin-bottom: 4px;
+      border-radius: 7px; margin-bottom: 4px;
       border: 1px solid var(--border2);
+      transition: border-color .1s;
     }
-    .my-file-emoji { font-size: 18px; flex-shrink: 0; }
+    .my-file-row:hover { border-color: var(--border); }
+    .my-file-emoji { font-size: 16px; flex-shrink: 0; }
     .my-file-info  { flex: 1; min-width: 0; }
     .my-file-name  { font-size: 12px; font-weight: 500; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
-    .my-file-meta  { font-size: 11px; font-family: var(--mono); color: var(--text2); }
+    .my-file-meta  { font-size: 10px; font-family: var(--mono); color: var(--text2); }
     .btn-remove {
       background: none; border: none; cursor: pointer;
       color: var(--text3); font-size: 14px; padding: 2px 4px;
@@ -399,44 +554,56 @@
     }
     .btn-remove:hover { color: var(--red); }
 
-    /* Peer files list */
     .peer-file-row {
       display: flex; align-items: center; gap: 8px;
       padding: 8px 10px;
-      border-radius: 6px; margin-bottom: 3px;
+      border-radius: 7px; margin-bottom: 3px;
       border: 1px solid var(--border2);
       cursor: pointer;
-      transition: border-color .1s, background .1s;
+      transition: border-color .15s, background .15s, box-shadow .15s;
     }
-    .peer-file-row:hover { border-color: var(--blue); background: var(--blue-dim); }
+    .peer-file-row:hover {
+      border-color: var(--gold);
+      background: var(--gold-dim);
+      box-shadow: 0 0 12px rgba(245,166,35,.08);
+    }
     .peer-file-row.downloading { opacity: .5; pointer-events: none; }
 
-    /* Peer section header */
     .peer-section-title {
-      font-size: 11px; font-weight: 600; color: var(--text2);
-      text-transform: uppercase; letter-spacing: .06em;
-      padding: 10px 10px 4px;
+      font-size: 10px; font-weight: 700; color: var(--text3);
+      text-transform: uppercase; letter-spacing: .1em;
+      padding: 10px 10px 6px;
     }
 
-    /* Connection overlay */
+    /* ── Connection overlay ──────────────────────────────────────────────── */
     #conn-overlay {
       position: fixed; inset: 0;
-      background: var(--bg);
+      background: radial-gradient(ellipse at center, #030f24 0%, #020817 100%);
       display: flex; align-items: center; justify-content: center;
       z-index: 100;
-      flex-direction: column; gap: 16px;
+      flex-direction: column; gap: 20px;
     }
     #conn-overlay.hidden { display: none; }
-    .spinner {
-      width: 40px; height: 40px;
-      border: 3px solid var(--border);
-      border-top-color: var(--blue);
-      border-radius: 50%;
-      animation: spin 1s linear infinite;
-    }
+
+    .overlay-logo { font-size: 48px; animation: spin 6s linear infinite; }
     @keyframes spin { to { transform: rotate(360deg); } }
 
-    /* Toasts */
+    .spinner {
+      width: 44px; height: 44px;
+      border: 3px solid rgba(245,166,35,.15);
+      border-top-color: var(--gold);
+      border-radius: 50%;
+      animation: spinFast 1s linear infinite;
+      box-shadow: 0 0 16px rgba(245,166,35,.2);
+    }
+    @keyframes spinFast { to { transform: rotate(360deg); } }
+
+    .overlay-text {
+      font-size: 13px; color: var(--text2);
+      letter-spacing: .04em;
+    }
+
+    /* ── Toasts ──────────────────────────────────────────────────────────── */
     #toast-container {
       position: fixed; bottom: 16px; right: 16px; z-index: 200;
       display: flex; flex-direction: column; gap: 6px; align-items: flex-end;
@@ -446,9 +613,9 @@
       padding: 10px 14px;
       background: var(--surface);
       border: 1px solid var(--border);
-      border-radius: 8px;
+      border-radius: 10px;
       min-width: 240px; max-width: 320px;
-      box-shadow: 0 4px 12px rgba(0,0,0,.4);
+      box-shadow: 0 8px 24px rgba(0,0,0,.5);
       animation: slideIn .2s ease;
     }
     @keyframes slideIn { from { opacity:0; transform: translateX(16px); } }
@@ -457,35 +624,38 @@
     .toast-icon { width: 18px; height: 18px; flex-shrink: 0; margin-top: 1px; }
     .toast-icon.success { color: var(--green); }
     .toast-icon.error   { color: var(--red); }
-    .toast-icon.info    { color: var(--blue); }
+    .toast-icon.info    { color: var(--gold); }
     .toast-title { font-size: 13px; font-weight: 600; }
     .toast-msg   { font-size: 12px; color: var(--text2); }
 
-    /* Name editor */
-    .name-edit {
-      display: flex; gap: 6px; padding: 10px 16px;
-      border-top: 1px solid var(--border2);
-      flex-shrink: 0;
+    /* ── Canvas chunk minimap (large files > 2000 chunks) ──────────────── */
+    .chunk-canvas {
+      width: 100%; display: block;
+      border-radius: 6px;
+      image-rendering: pixelated;
     }
-    .name-input {
-      flex: 1; background: var(--bg); border: 1px solid var(--border);
-      color: var(--text); font-size: 13px; padding: 5px 8px;
-      border-radius: 5px; outline: none;
+    .chunk-map-summary {
+      display: flex; gap: 16px; align-items: center;
+      font-size: 10px; font-family: var(--mono);
+      color: var(--text2); margin-top: 5px; flex-wrap: wrap;
     }
-    .name-input:focus { border-color: var(--blue); }
+    .cms-item { display: flex; align-items: center; gap: 4px; }
+    .cms-dot  { width: 7px; height: 7px; border-radius: 2px; flex-shrink: 0; }
 
-    /* Scrollbars */
-    ::-webkit-scrollbar { width: 6px; }
+    /* ── Scrollbars ──────────────────────────────────────────────────────── */
+    ::-webkit-scrollbar { width: 5px; }
     ::-webkit-scrollbar-track { background: transparent; }
     ::-webkit-scrollbar-thumb { background: var(--border); border-radius: 3px; }
+    ::-webkit-scrollbar-thumb:hover { background: var(--text3); }
   </style>
 </head>
 <body>
 
 <!-- Connection overlay -->
 <div id="conn-overlay">
+  <div class="overlay-logo">⚽</div>
   <div class="spinner"></div>
-  <span style="color:var(--text2);font-size:13px">Đang kết nối tới Signaling Server…</span>
+  <span class="overlay-text">Đang kết nối tới Signaling Server…</span>
 </div>
 
 <div id="app">
@@ -493,16 +663,16 @@
   <!-- ── Header ──────────────────────────────────────────────────────── -->
   <header>
     <div class="logo">
-      <div class="logo-icon">
-        <svg fill="none" stroke="currentColor" viewBox="0 0 24 24">
-          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-            d="M8 7h12m0 0l-4-4m4 4l-4 4m0 6H4m0 0l4 4m-4-4l4-4"/>
-        </svg>
-      </div>
+      <div class="logo-icon">⚽</div>
       <div>
-        <div class="logo-title">P2P Transfer</div>
+        <div class="logo-title">WC2026 P2P</div>
         <div class="logo-sub">WebRTC · SHA-256 Verified</div>
       </div>
+    </div>
+
+    <div class="wc-badge">
+      <div class="wc-badge-dot"></div>
+      FIFA World Cup 2026
     </div>
 
     <div class="header-spacer"></div>
@@ -535,28 +705,29 @@
     <!-- Peer ID badge -->
     <div class="badge" id="id-badge" style="display:none">
       <div class="badge-dot"></div>
-      <span style="color:var(--text2)">ID</span>
-      <span id="my-peer-id" style="color:var(--blue);font-weight:600">—</span>
-      <button id="copy-id-btn" title="Sao chép" style="background:none;border:none;cursor:pointer;color:var(--text2);padding:0 2px;font-size:13px">⎘</button>
+      <span style="color:var(--text2);font-size:11px">ID</span>
+      <span id="my-peer-id" style="color:var(--gold);font-weight:700">—</span>
+      <button id="copy-id-btn" title="Sao chép"
+        style="background:none;border:none;cursor:pointer;color:var(--text2);padding:0 2px;font-size:13px">⎘</button>
     </div>
   </header>
 
   <!-- ── Stats bar ────────────────────────────────────────────────────── -->
   <div id="stats-bar">
     <div class="stat">
-      <span class="stat-label">Peers</span>
+      <span class="stat-label">🌐 Peers</span>
       <span class="stat-value blue" id="stat-peers">0</span>
     </div>
     <div class="stat">
-      <span class="stat-label">Kết nối P2P</span>
+      <span class="stat-label">⚡ P2P</span>
       <span class="stat-value green" id="stat-connections">0</span>
     </div>
     <div class="stat">
-      <span class="stat-label">Upload</span>
+      <span class="stat-label">↑ Upload</span>
       <span class="stat-value orange" id="stat-upload">0 B/s</span>
     </div>
     <div class="stat">
-      <span class="stat-label">Download</span>
+      <span class="stat-label">↓ Download</span>
       <span class="stat-value blue" id="stat-download">0 B/s</span>
     </div>
     <div class="stat">
@@ -572,14 +743,14 @@
   <!-- ── Main 3 columns ─────────────────────────────────────────────── -->
   <div id="main">
 
-    <!-- ── LEFT: peers ──────────────────────────────────────────────── -->
+    <!-- ── LEFT: peers ─────────────────────────────────────────────── -->
     <div id="sidebar">
       <div class="panel-header">
-        <svg width="14" height="14" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+        <svg width="13" height="13" fill="none" stroke="currentColor" viewBox="0 0 24 24" style="color:var(--gold)">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5"
             d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0z"/>
         </svg>
-        <h2>Peers Trực Tuyến</h2>
+        <h2>Squad Online</h2>
         <span class="count-badge" id="peer-count">0</span>
       </div>
 
@@ -590,73 +761,68 @@
       </div>
 
       <div id="peers-list">
-        <div class="no-peers">Chưa có peer nào trực tuyến</div>
+        <div class="no-peers">
+          <div class="no-peers-icon">👥</div>
+          Chưa có peer nào trực tuyến
+        </div>
       </div>
 
-      <!-- Name edit -->
       <div class="name-edit" id="name-edit" style="display:none">
         <input type="text" class="name-input" id="name-input" placeholder="Tên của bạn…" maxlength="30">
         <button class="btn btn-ghost" id="save-name-btn">Lưu</button>
       </div>
     </div>
 
-    <!-- ── CENTER: transfers ─────────────────────────────────────────── -->
+    <!-- ── CENTER: transfers ────────────────────────────────────────── -->
     <div id="center">
       <div class="center-body" id="center-body">
 
-        <!-- Drop zone (visible when ≥1 peer connected) -->
         <div id="drop-zone" class="hidden">
           <input type="file" id="file-input" style="display:none" multiple>
           <div class="drop-icon">📂</div>
           <div class="drop-title">Thêm file để chia sẻ</div>
-          <div class="drop-sub">Kéo thả hoặc nhấp để chọn · File được chia 16 KB/chunk · SHA-256 verified</div>
+          <div class="drop-sub">Kéo thả hoặc nhấp để chọn · 16 KB/chunk · SHA-256 verified</div>
         </div>
 
-        <!-- Transfer items injected here by JS -->
         <div id="transfer-list"></div>
 
-        <!-- Received files -->
         <div id="received-section" style="display:none">
-          <div class="peer-section-title" style="padding:6px 0 4px;font-size:11px;color:var(--text2)">📥 FILE ĐÃ NHẬN</div>
+          <div class="peer-section-title">📥 File đã nhận</div>
           <div id="received-list"></div>
         </div>
 
-        <!-- Empty state -->
         <div id="empty-state">
-          <div class="empty-icon">⚡</div>
-          <h3>Sẵn sàng chuyển file</h3>
+          <div class="empty-icon">⚽</div>
+          <h3>Sẵn sàng thi đấu</h3>
           <p>Kết nối với một peer để bắt đầu chia sẻ file qua WebRTC P2P</p>
         </div>
 
-      </div><!-- /center-body -->
-    </div><!-- /center -->
+      </div>
+    </div>
 
-    <!-- ── RIGHT: file lists ───────────────────────────────────────────── -->
+    <!-- ── RIGHT: file lists ─────────────────────────────────────────── -->
     <div id="right-panel">
       <div class="panel-header">
+        <svg width="13" height="13" fill="none" stroke="currentColor" viewBox="0 0 24 24" style="color:var(--gold)">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5"
+            d="M3 7v10a2 2 0 002 2h14a2 2 0 002-2V9a2 2 0 00-2-2h-6l-2-2H5a2 2 0 00-2 2z"/>
+        </svg>
         <h2>Files</h2>
       </div>
       <div class="right-body">
-
-        <!-- My shared files -->
         <div id="my-files-section" style="display:none">
           <div class="peer-section-title">📤 File của tôi</div>
           <div id="my-files-list"></div>
         </div>
-
-        <!-- Peer files injected here by JS -->
         <div id="peer-files-sections"></div>
-
       </div>
-    </div><!-- /right-panel -->
+    </div>
 
-  </div><!-- /main -->
-</div><!-- /app -->
+  </div>
+</div>
 
-<!-- Toast notifications -->
 <div id="toast-container"></div>
 
-<!-- Application scripts -->
 <script src="/webrtc.js"></script>
 <script src="/app.js"></script>
 

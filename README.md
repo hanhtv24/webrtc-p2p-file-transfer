@@ -19,7 +19,7 @@ Browser-based peer-to-peer file sharing over WebRTC DataChannel with SHA-256 int
 - Nhiều peer đồng thời — mỗi kết nối là một `RTCPeerConnection` độc lập, quản lý qua `Map<socketId, PeerConnection>`
 - ICE tự chọn đường tốt nhất: Host (LAN) → STUN (NAT traversal)
 - Kết nối / ngắt kết nối từng peer độc lập
-- Peer ID dạng `[Động vật] [6 ký tự]` để dễ nhận diện
+- Peer identity: ảnh cờ quốc gia + tên cầu thủ nổi bật World Cup 2026 — ví dụ `🏴 Cristiano Ronaldo (Portugal)`
 
 **Truyền file**
 
