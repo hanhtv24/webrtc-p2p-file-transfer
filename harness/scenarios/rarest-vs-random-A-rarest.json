@@ -1,0 +1,12 @@
+{
+  "name": "rarest",
+  "fileSizeMB": 8,
+  "chunkSize": 65536,
+  "seeders": 1,
+  "leechers": 6,
+  "strategy": "rarest",
+  "uploadKBps": 1024,
+  "trackerPort": 4003,
+  "timeoutMs": 120000,
+  "churn": []
+}

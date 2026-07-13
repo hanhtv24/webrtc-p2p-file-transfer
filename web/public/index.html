@@ -1,0 +1,60 @@
+<!doctype html>
+<html lang="vi">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>P2P File Share — Bảng điều khiển</title>
+  <link rel="stylesheet" href="/style.css" />
+</head>
+<body>
+  <header>
+    <h1>🔗 Hệ thống chia sẻ file P2P <span class="sub">(mô phỏng BitTorrent)</span></h1>
+    <div id="config" class="config">đang tải cấu hình…</div>
+  </header>
+
+  <main>
+    <section class="card">
+      <h2>1. Chia sẻ file mới</h2>
+      <p class="hint">File được chia thành chunk, tính hash SHA-256 từng chunk, và server sẽ tự làm <b>seeder</b> ngay.</p>
+      <form id="uploadForm">
+        <input type="file" id="fileInput" required />
+        <label class="inline">
+          Kích thước chunk (byte):
+          <input type="number" id="chunkSize" value="65536" min="1024" step="1024" />
+        </label>
+        <button type="submit">Tải lên &amp; chia sẻ</button>
+        <span id="uploadStatus" class="status"></span>
+      </form>
+    </section>
+
+    <section class="card">
+      <h2>2. Danh sách torrent</h2>
+      <table id="torrentTable">
+        <thead>
+          <tr><th>Tên file</th><th>Kích thước</th><th>Số chunk</th><th>Infohash</th><th></th></tr>
+        </thead>
+        <tbody></tbody>
+      </table>
+    </section>
+
+    <section class="card">
+      <h2>3. Peer đang chạy (real-time)</h2>
+      <table id="peerTable">
+        <thead>
+          <tr>
+            <th>Vai trò</th><th>Peer ID</th><th>File</th><th>Tiến độ</th>
+            <th>↓ tốc độ</th><th>↑ tốc độ</th><th>Kết nối</th><th>Nguồn</th><th></th>
+          </tr>
+        </thead>
+        <tbody></tbody>
+      </table>
+    </section>
+  </main>
+
+  <footer>
+    Đồ án Hệ thống phân tán — Chia sẻ file P2P. Xem thêm tài liệu trong <code>docs/</code>.
+  </footer>
+
+  <script src="/app.js"></script>
+</body>
+</html>

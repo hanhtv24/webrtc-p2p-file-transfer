@@ -1,0 +1,12 @@
+{
+  "name": "scaling",
+  "fileSizeMB": 8,
+  "chunkSize": 65536,
+  "seeders": 1,
+  "leechers": 8,
+  "strategy": "rarest",
+  "uploadKBps": 2048,
+  "trackerPort": 4002,
+  "timeoutMs": 90000,
+  "churn": []
+}

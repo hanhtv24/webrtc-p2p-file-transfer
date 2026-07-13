@@ -28,3 +28,15 @@ logs/
 *.docx
 HTTT_*.pdf
 Bài\ tập\ lớn.*
+
+# Hệ thống BitTorrent-like (bittorrent/ + harness/): file test/kết quả sinh khi chạy
+harness/tmp/
+harness/results/
+bittorrent/**/*.meta.json
+bittorrent/testfile.bin
+
+# Web dashboard: file upload/download sinh khi chạy
+web/data/uploads/*
+web/data/downloads/*
+!web/data/uploads/.gitkeep
+!web/data/downloads/.gitkeep

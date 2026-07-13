@@ -1,0 +1,12 @@
+{
+  "name": "baseline",
+  "fileSizeMB": 4,
+  "chunkSize": 65536,
+  "seeders": 1,
+  "leechers": 3,
+  "strategy": "rarest",
+  "uploadKBps": 2048,
+  "trackerPort": 4001,
+  "timeoutMs": 60000,
+  "churn": []
+}

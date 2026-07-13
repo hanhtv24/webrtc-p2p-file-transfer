@@ -1,0 +1,15 @@
+{
+  "name": "churn",
+  "fileSizeMB": 8,
+  "chunkSize": 65536,
+  "seeders": 1,
+  "leechers": 4,
+  "strategy": "rarest",
+  "uploadKBps": 1024,
+  "trackerPort": 4005,
+  "timeoutMs": 120000,
+  "churn": [
+    { "atMs": 2000, "action": "kill", "target": "leech", "index": 0 },
+    { "atMs": 5000, "action": "restart", "target": "leech", "index": 0 }
+  ]
+}
