@@ -30,6 +30,9 @@ HTTT_*.pdf
 Bài\ tập\ lớn.*
 docs/KIEM_THU_WEBRTC.md
 
+# Ngoại lệ: báo cáo chính thức nộp bài — đẩy lên repo
+!docs/CHTPT_Nhóm_10_Hệ thống chia sẻ file ngang hàng (P2P).docx
+
 # Hệ thống BitTorrent-like (bittorrent/ + harness/): file test/kết quả sinh khi chạy
 harness/tmp/
 harness/results/
