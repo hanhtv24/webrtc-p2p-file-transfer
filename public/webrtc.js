@@ -66,7 +66,7 @@ class PeerConnection {
   }
 
   send(data) {
-    if (this.dataChannel && this.dataChannel.readyState === 'open') {
+    if (this.dataChannel?.readyState === 'open') {
       this.dataChannel.send(data);
       return true;
     }
@@ -136,8 +136,12 @@ class PeerConnection {
 
   close() {
     this.state = 'closed';
-    if (this.dataChannel) { try { this.dataChannel.close(); } catch (_) {} }
-    if (this.pc)          { try { this.pc.close();          } catch (_) {} }
+    if (this.dataChannel) {
+      try { this.dataChannel.close(); } catch (e) { console.warn('[close] dataChannel.close() lỗi:', e.message); }
+    }
+    if (this.pc) {
+      try { this.pc.close(); } catch (e) { console.warn('[close] pc.close() lỗi:', e.message); }
+    }
   }
 
   // ── Private ───────────────────────────────────────────────────────────────
@@ -243,10 +247,10 @@ class PeerConnection {
       rf.receivedSize += chunkData.length;
 
       const pct = rf.receivedSize / rf.size * 100;
-      this.handler._onFileProgress(
-        this, fileId, pct, rf.receivedSize, rf.size,
-        chunkIndex, [...rf.chunkStatus], 'receiving'
-      );
+      this.handler._onFileProgress(this, fileId, {
+        pct, cur: rf.receivedSize, tot: rf.size,
+        chunkIdx: chunkIndex, chunkStatus: [...rf.chunkStatus], dir: 'receiving',
+      });
     });
   }
 
@@ -258,10 +262,10 @@ class PeerConnection {
 
     if (!hashOk) console.error(`[Hash] File "${rf.name}" hash mismatch!`);
 
-    this.handler._onFileComplete(
-      this, fileId, blob, rf.name, rf.size,
-      [...rf.chunkStatus], hashOk, 'receiving'
-    );
+    this.handler._onFileComplete(this, fileId, {
+      blob, name: rf.name, size: rf.size,
+      chunkStatus: [...rf.chunkStatus], hashOk, dir: 'receiving',
+    });
     this.receivingFiles.delete(fileId);
   }
 }
@@ -281,8 +285,8 @@ class WebRTCHandler {
     this.onPeerDisconnected = null; // (peerId, socketId)
     this.onFileList         = null; // (peerId, socketId, files[])
     this.onFileStart        = null; // (peerId, meta)
-    this.onFileProgress     = null; // (peerId, fileId, pct, cur, tot, chunkIdx, chunkStatus[], dir)
-    this.onFileComplete     = null; // (peerId, fileId, blob, name, size, chunkStatus[], hashOk, dir)
+    this.onFileProgress     = null; // (peerId, fileId, {pct, cur, tot, chunkIdx, chunkStatus[], dir})
+    this.onFileComplete     = null; // (peerId, fileId, {blob, name, size, chunkStatus[], hashOk, dir})
     this.onFileRequest      = null; // (peerId, fileId)
   }
 
@@ -317,7 +321,7 @@ class WebRTCHandler {
   /** Gửi danh sách file đang share cho một peer */
   sendFileList(socketId) {
     const conn = this.connections.get(socketId);
-    if (!conn || !conn.isOpen) return;
+    if (!conn?.isOpen) return;
     const files = Array.from(this.sharedFiles.values()).map(f => ({
       id: f.id, name: f.name, size: f.size, type: f.type,
     }));
@@ -334,7 +338,7 @@ class WebRTCHandler {
   /** Yêu cầu nhận file từ một peer */
   requestFile(socketId, fileId) {
     const conn = this.connections.get(socketId);
-    if (conn && conn.isOpen) {
+    if (conn?.isOpen) {
       conn.sendJSON({ type: 'file-request', fileId });
     }
   }
@@ -342,7 +346,7 @@ class WebRTCHandler {
   /** Kiểm tra có kết nối P2P mở với socketId không */
   isConnected(socketId) {
     const conn = this.connections.get(socketId);
-    return !!(conn && conn.isOpen);
+    return !!conn?.isOpen;
   }
 
   /** Số kết nối P2P đang mở */
@@ -384,11 +388,11 @@ class WebRTCHandler {
     // Bắt đầu gửi file
     conn.sendFile(shared.file, fileId, (fid, pct, cur, tot, idx, dir) => {
       if (this.onFileProgress) {
-        this.onFileProgress(conn.remotePeerId, fid, pct, cur, tot, idx, null, dir);
+        this.onFileProgress(conn.remotePeerId, fid, { pct, cur, tot, chunkIdx: idx, chunkStatus: null, dir });
       }
     }).then(() => {
       if (this.onFileComplete) {
-        this.onFileComplete(conn.remotePeerId, fileId, null, shared.name, shared.size, [], true, 'sending');
+        this.onFileComplete(conn.remotePeerId, fileId, { blob: null, name: shared.name, size: shared.size, chunkStatus: [], hashOk: true, dir: 'sending' });
       }
     });
   }
@@ -397,15 +401,15 @@ class WebRTCHandler {
     if (this.onFileStart) this.onFileStart(conn.remotePeerId, meta);
   }
 
-  _onFileProgress(conn, fileId, pct, cur, tot, chunkIdx, chunkStatus, dir) {
+  _onFileProgress(conn, fileId, info) {
     if (this.onFileProgress) {
-      this.onFileProgress(conn.remotePeerId, fileId, pct, cur, tot, chunkIdx, chunkStatus, dir);
+      this.onFileProgress(conn.remotePeerId, fileId, info);
     }
   }
 
-  _onFileComplete(conn, fileId, blob, name, size, chunkStatus, hashOk, dir) {
+  _onFileComplete(conn, fileId, info) {
     if (this.onFileComplete) {
-      this.onFileComplete(conn.remotePeerId, fileId, blob, name, size, chunkStatus, hashOk, dir);
+      this.onFileComplete(conn.remotePeerId, fileId, info);
     }
   }
 }

@@ -136,13 +136,15 @@ function setupWebRTC() {
     addTransferCard(meta.fileId, meta.name, meta.size, meta.totalChunks, 'receiving', peerId);
   };
 
-  webrtc.onFileProgress = (peerId, fileId, pct, cur, tot, chunkIdx, chunkStatus, dir) => {
+  webrtc.onFileProgress = (peerId, fileId, info) => {
+    const { pct, cur, tot, chunkIdx, chunkStatus, dir } = info;
     updateTransferCard(fileId, pct, cur, tot, chunkIdx, chunkStatus);
     if (dir === 'receiving') state.recvBytes += (tot / (tot / 16384 || 1) * 0.01);
     else                     state.sentBytes += (tot / (tot / 16384 || 1) * 0.01);
   };
 
-  webrtc.onFileComplete = (peerId, fileId, blob, name, size, chunkStatus, hashOk, dir) => {
+  webrtc.onFileComplete = (peerId, fileId, info) => {
+    const { blob, name, size, hashOk, dir } = info;
     finishTransferCard(fileId, hashOk);
     if (dir === 'receiving' && blob) {
       state.received.set(fileId, { blob, name, size, hashOk });
@@ -261,7 +263,9 @@ window.disconnectPeer = (socketId, peerId) => {
 
 function addFiles(fileList) {
   for (const file of fileList) {
-    const id = Math.random().toString(36).slice(2, 10);
+    // Dùng crypto.getRandomValues thay vì Math.random() — không phải vì cần an
+    // toàn mật mã (chỉ là id cục bộ để tra Map), nhưng tránh cảnh báo PRNG yếu.
+    const id = crypto.getRandomValues(new Uint32Array(2)).join('');
     state.myShared.set(id, { file, id, name: file.name, size: file.size, type: file.type });
   }
   // Gán vào handler để phục vụ yêu cầu từ peer
@@ -458,7 +462,7 @@ function _roundRect(ctx, x, y, w, h, r, fill) {
 // Cập nhật summary badge (OK / lỗi / còn lại)
 function _updateSummary(fileId) {
   const t = state.transfers.get(fileId);
-  if (!t || !t._cv) return;
+  if (!t?._cv) return;
   const ok  = t.chunkStatus.filter(s => s === 'ok').length;
   const bad = t.chunkStatus.filter(s => s === 'bad').length;
   const pen = t.chunkStatus.length - ok - bad;
@@ -535,19 +539,12 @@ function addTransferCard(fileId, name, size, totalChunks, dir, peerId) {
   }
 }
 
-function updateTransferCard(fileId, pct, cur, tot, chunkIdx, chunkStatus) {
-  const t = state.transfers.get(fileId);
-  if (!t) return;
-
-  t.progress = pct;
-  if (chunkStatus) t.chunkStatus = chunkStatus;
-
-  // Progress bar
+// Cập nhật progress bar + text thống kê (bytes/tốc độ/%) của 1 transfer card.
+function _updateTransferStats(fileId, pct, cur, tot, startTime) {
   const bar = $(`pf-bar-${fileId}`);
   if (bar) bar.style.width = pct.toFixed(1) + '%';
 
-  // Stats text
-  const elapsed = (Date.now() - t.startTime) / 1000 || 0.001;
+  const elapsed = (Date.now() - startTime) / 1000 || 0.001;
   const speed   = cur / elapsed;
   const bEl = $(`ts-bytes-${fileId}`);
   const sEl = $(`ts-speed-${fileId}`);
@@ -555,18 +552,38 @@ function updateTransferCard(fileId, pct, cur, tot, chunkIdx, chunkStatus) {
   if (bEl) bEl.textContent = `${fmtBytes(cur)} / ${fmtBytes(tot)}`;
   if (sEl) sEl.textContent = `${fmtBytes(speed)}/s`;
   if (pEl) pEl.textContent = `${Math.round(pct)}%`;
+}
 
-  // Chunk visualization
-  if (chunkIdx != null) {
-    const status = chunkStatus ? chunkStatus[chunkIdx] : 'ok';
-    if (t.useCanvas) {
-      _paintCell(fileId, chunkIdx, status);
-      _updateSummary(fileId);
-    } else {
-      const cell = $(`cc-${fileId}-${chunkIdx}`);
-      if (cell) cell.className = `chunk-cell ${status === 'ok' ? 'ok' : status === 'bad' ? 'bad' : 'in'}`;
-    }
+// Tên class CSS cho 1 ô chunk theo trạng thái — tách thành statement độc lập
+// thay vì ternary lồng nhau ngay tại nơi dùng.
+function _chunkCellClass(status) {
+  if (status === 'ok') return 'ok';
+  if (status === 'bad') return 'bad';
+  return 'in';
+}
+
+// Vẽ/tô lại 1 ô chunk (canvas hoặc DOM) theo trạng thái mới nhất.
+function _updateChunkVisualization(fileId, t, chunkIdx, chunkStatus) {
+  if (chunkIdx == null) return;
+  const status = chunkStatus ? chunkStatus[chunkIdx] : 'ok';
+  if (t.useCanvas) {
+    _paintCell(fileId, chunkIdx, status);
+    _updateSummary(fileId);
+    return;
   }
+  const cell = $(`cc-${fileId}-${chunkIdx}`);
+  if (cell) cell.className = `chunk-cell ${_chunkCellClass(status)}`;
+}
+
+function updateTransferCard(fileId, pct, cur, tot, chunkIdx, chunkStatus) {
+  const t = state.transfers.get(fileId);
+  if (!t) return;
+
+  t.progress = pct;
+  if (chunkStatus) t.chunkStatus = chunkStatus;
+
+  _updateTransferStats(fileId, pct, cur, tot, t.startTime);
+  _updateChunkVisualization(fileId, t, chunkIdx, chunkStatus);
 }
 
 function finishTransferCard(fileId, hashOk) {
@@ -631,7 +648,7 @@ window.saveFile = fileId => {
   const a   = document.createElement('a');
   a.href = url; a.download = f.name;
   document.body.appendChild(a); a.click();
-  document.body.removeChild(a);
+  a.remove();
   URL.revokeObjectURL(url);
 };
 
@@ -653,13 +670,17 @@ function updateStats() {
 
 // ─── STUN public IP ───────────────────────────────────────────────────────────
 
+// Khớp đúng cấu trúc dòng ICE candidate srflx: "candidate:F C T P addr port typ srflx ..."
+// — dùng lớp ký tự cụ thể thay vì ".*" để tránh backtracking siêu tuyến tính.
+const SRFLX_CANDIDATE_RE = /^candidate:\S+ \d+ \S+ \d+ ([\d.]+) \d+ typ srflx/;
+
 async function getPublicIP() {
   return new Promise(resolve => {
     const pc = new RTCPeerConnection({ iceServers: [{ urls: 'stun:stun.l.google.com:19302' }] });
     let ip = null;
     pc.onicecandidate = ({ candidate }) => {
       if (!candidate) { pc.close(); resolve(ip); return; }
-      const m = candidate.candidate.match(/\d+ \d+ \w+ \d+ ([0-9.]+) .* typ srflx/);
+      const m = SRFLX_CANDIDATE_RE.exec(candidate.candidate);
       if (m) ip = m[1];
     };
     pc.createDataChannel('');
@@ -708,7 +729,7 @@ document.addEventListener('DOMContentLoaded', init);
 // ─── Theme ────────────────────────────────────────────────────────────────────
 
 function setTheme(theme) {
-  document.documentElement.setAttribute('data-theme', theme);
+  document.documentElement.dataset.theme = theme;
   localStorage.setItem('theme', theme);
   document.getElementById('theme-dark').classList.toggle('active', theme === 'dark');
   document.getElementById('theme-light').classList.toggle('active', theme === 'light');

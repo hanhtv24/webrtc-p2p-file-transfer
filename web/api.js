@@ -14,9 +14,9 @@
  */
 
 const express = require("express");
-const fs = require("fs");
-const path = require("path");
-const crypto = require("crypto");
+const fs = require("node:fs");
+const path = require("node:path");
+const crypto = require("node:crypto");
 
 const {
   createMetadata,
@@ -39,6 +39,36 @@ function randomId(n = 8) {
 }
 
 /**
+ * Parse 1 “part” (giữa 2 boundary) của multipart/form-data thành header + body,
+ * rối gán vào `fields` (text) hoặc `files` (có filename) tương ứng.
+ * Tách ra khỏi `parseMultipart` để giảm độ phức tạp của hàm chính.
+ * @param {Buffer} rawPart
+ * @param {Record<string, string>} fields
+ * @param {Record<string, {filename: string, buffer: Buffer}>} files
+ */
+function parsePart(rawPart, fields, files) {
+  let part = rawPart;
+  if (part.subarray(0, 2).toString() === "\r\n") part = part.subarray(2);
+  if (part.subarray(-2).toString() === "\r\n") part = part.subarray(0, -2);
+
+  const headerEnd = part.indexOf("\r\n\r\n");
+  if (headerEnd < 0) return;
+
+  const headerText = part.subarray(0, headerEnd).toString("utf8");
+  const body = part.subarray(headerEnd + 4);
+  const nameMatch = headerText.match(/name="([^"]*)"/);
+  const filenameMatch = headerText.match(/filename="([^"]*)"/);
+  const name = nameMatch ? nameMatch[1] : null;
+  if (!name) return;
+
+  if (filenameMatch?.[1]) {
+    files[name] = { filename: path.basename(filenameMatch[1]), buffer: Buffer.from(body) };
+  } else {
+    fields[name] = body.toString("utf8");
+  }
+}
+
+/**
  * Parser multipart/form-data tối giản (đủ dùng cho <input type=file> qua fetch).
  * Trả về { fields: {name:string}, files: {name:{filename, buffer}} }.
  */
@@ -50,29 +80,7 @@ function parseMultipart(buffer, boundary) {
   while (start >= 0) {
     const next = buffer.indexOf(boundaryBuf, start + boundaryBuf.length);
     if (next < 0) break;
-    let part = buffer.subarray(start + boundaryBuf.length, next);
-    if (part.slice(0, 2).toString() === "\r\n") part = part.subarray(2);
-    if (part.slice(-2).toString() === "\r\n")
-      part = part.subarray(0, part.length - 2);
-
-    const headerEnd = part.indexOf("\r\n\r\n");
-    if (headerEnd >= 0) {
-      const headerText = part.subarray(0, headerEnd).toString("utf8");
-      const body = part.subarray(headerEnd + 4);
-      const nameMatch = headerText.match(/name="([^"]*)"/);
-      const filenameMatch = headerText.match(/filename="([^"]*)"/);
-      const name = nameMatch ? nameMatch[1] : null;
-      if (name) {
-        if (filenameMatch && filenameMatch[1]) {
-          files[name] = {
-            filename: path.basename(filenameMatch[1]),
-            buffer: Buffer.from(body),
-          };
-        } else {
-          fields[name] = body.toString("utf8");
-        }
-      }
-    }
+    parsePart(buffer.subarray(start + boundaryBuf.length, next), fields, files);
     start = next;
   }
   return { fields, files };
@@ -81,6 +89,36 @@ function parseMultipart(buffer, boundary) {
 function getBoundary(contentType) {
   const m = /boundary=(?:"([^"]+)"|([^;]+))/i.exec(contentType || "");
   return m ? m[1] || m[2] : null;
+}
+
+/**
+ * Dịch 1 peer (seed/leech đang chạy) thành object JSON gỬn cho FE poll.
+ * Đặt ngoài `createBittorrentRouter` vì không dùng biến closure nào.
+ * @param {string} id
+ * @param {{peer: Peer, role: 'seed'|'leech', infohash: string, name: string, outFile?: string, createdAt: number}} entry
+ */
+function serializePeer(id, entry) {
+  const p = entry.peer;
+  const chunkCount = p.meta.chunkCount;
+  const have = p.store.count();
+  return {
+    id,
+    peerId: p.peerId,
+    role: entry.role,
+    infohash: entry.infohash,
+    name: entry.name,
+    port: p.port,
+    have,
+    chunkCount,
+    percent: chunkCount ? Math.round((have / chunkCount) * 1000) / 10 : 0,
+    bytesDown: p.bytesDown,
+    bytesUp: p.bytesUp,
+    connections: p.conns.size,
+    sources: p.sources.size,
+    complete: !!p.completeTime,
+    ms: p.completeTime ? p.completeTime - p.startTime : null,
+    createdAt: entry.createdAt,
+  };
 }
 
 /**
@@ -162,30 +200,6 @@ function createBittorrentRouter({ trackerUrl }) {
       createdAt: Date.now(),
     });
     return id;
-  }
-
-  function serializePeer(id, entry) {
-    const p = entry.peer;
-    const chunkCount = p.meta.chunkCount;
-    const have = p.store.count();
-    return {
-      id,
-      peerId: p.peerId,
-      role: entry.role,
-      infohash: entry.infohash,
-      name: entry.name,
-      port: p.port,
-      have,
-      chunkCount,
-      percent: chunkCount ? Math.round((have / chunkCount) * 1000) / 10 : 0,
-      bytesDown: p.bytesDown,
-      bytesUp: p.bytesUp,
-      connections: p.conns.size,
-      sources: p.sources.size,
-      complete: !!p.completeTime,
-      ms: p.completeTime ? p.completeTime - p.startTime : null,
-      createdAt: entry.createdAt,
-    };
   }
 
   // ===================== ROUTES API =====================
@@ -275,7 +289,9 @@ function createBittorrentRouter({ trackerUrl }) {
         recursive: true,
         force: true,
       });
-    } catch (_) {}
+    } catch (err) {
+      console.error(`[bittorrent-api] không xóa được thư mục torrent ${req.params.infohash}:`, err instanceof Error ? err.message : err);
+    }
     torrents.delete(req.params.infohash);
     res.json({ ok: true });
   });
@@ -296,7 +312,7 @@ function createBittorrentRouter({ trackerUrl }) {
 
   router.get("/api/peers/:id/file", (req, res) => {
     const entry = peers.get(req.params.id);
-    if (!entry || entry.role !== "leech" || !entry.outFile)
+    if (entry?.role !== "leech" || !entry?.outFile)
       return res.status(404).json({ error: "không có file" });
     if (!entry.peer.completeTime)
       return res.status(409).json({ error: "chưa tải xong" });

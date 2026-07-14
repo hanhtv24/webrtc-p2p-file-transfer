@@ -35,7 +35,10 @@
         <div class="panel-body">
           <p class="hint">File được chia thành chunk, tính hash SHA-256 từng chunk, và server sẽ tự làm <b>seeder</b> ngay.</p>
           <form id="uploadForm">
-            <input type="file" id="fileInput" required />
+            <label class="inline" for="fileInput">
+              Tệp cần chia sẻ
+              <input type="file" id="fileInput" required />
+            </label>
             <label class="inline">
               Kích thước chunk (byte)
               <input type="number" id="chunkSize" value="65536" min="1024" step="1024" class="input-mono" />

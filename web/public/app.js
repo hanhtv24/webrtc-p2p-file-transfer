@@ -96,6 +96,85 @@ async function startDownload(infohash, btn) {
   }
 }
 
+// Tính tốc độ tức thời (KB/s) dựa trên snapshot lần poll trước, cập nhật snapshot mới.
+function computeSpeeds(p, now) {
+  const prev = prevSnapshot.get(p.id);
+  let downKBps = 0,
+    upKBps = 0;
+  if (prev) {
+    const dt = (now - prev.t) / 1000;
+    if (dt > 0) {
+      downKBps = Math.max(0, (p.bytesDown - prev.bytesDown) / 1024 / dt);
+      upKBps = Math.max(0, (p.bytesUp - prev.bytesUp) / 1024 / dt);
+    }
+  }
+  prevSnapshot.set(p.id, { bytesDown: p.bytesDown, bytesUp: p.bytesUp, t: now });
+  return { downKBps, upKBps };
+}
+
+function buildRoleCell(p) {
+  const roleBadge =
+    p.role === "seed"
+      ? '<span class="badge seed">SEED</span>'
+      : '<span class="badge leech">LEECH</span>';
+  // Icon nhỏ (không phải badge chữ "xong") để không làm ô "Vai trò" giãn to —
+  // tooltip giải thích ý nghĩa khi rê chuột.
+  const doneBadge = p.complete
+    ? '<span class="badge-check" title="Đã hoàn tất">✓</span>'
+    : "";
+  return `<div class="role-cell">${roleBadge}${doneBadge}</div>`;
+}
+
+// Cột tốc độ tải xuống: đang tải → tốc độ tức thời; đã xong → tốc độ TRUNG
+// BÌNH cả quá trình (bytesDown/thời gian) thay vì để tụt về 0 gây hiểu lầm
+// là "không tải được gì". Dùng nhãn chữ "TB" (thay vì ký hiệu toán học ⌀)
+// để người dùng không quen ký hiệu vẫn hiểu ngay, kèm tooltip giải thích.
+function buildDownCell(p, downKBps) {
+  if (p.role !== "leech") return { cell: "-", title: "" };
+  if (!p.complete) return { cell: fmtRate(downKBps), title: "" };
+  if (p.ms > 0) {
+    const title = "Tốc độ trung bình cả quá trình tải";
+    const rate = fmtRate(p.bytesDown / 1024 / (p.ms / 1000));
+    return { cell: `<span class="rate-tag" title="${title}">TB</span>${rate}`, title };
+  }
+  return { cell: "-", title: "" };
+}
+
+// Cột tốc độ chia sẻ: đang có người tải từ mình → tốc độ tức thời; nếu hiện
+// tại không ai đang xin chunk (tốc độ tức thời = 0) nhưng đã từng phục vụ
+// → hiện tổng dung lượng đã chia sẻ (nhãn "Tổng"), tránh hiểu lầm "không hoạt động".
+function buildUpCell(p, upKBps) {
+  if (upKBps > 0) return { cell: fmtRate(upKBps), title: "" };
+  if (p.bytesUp > 0) {
+    const title = "Tổng dung lượng đã chia sẻ";
+    return { cell: `<span class="rate-tag" title="${title}">Tổng</span>${fmtBytes(p.bytesUp)}`, title };
+  }
+  return { cell: "-", title: "" };
+}
+
+function buildPeerRow(p, downKBps, upKBps) {
+  const down = buildDownCell(p, downKBps);
+  const up = buildUpCell(p, upKBps);
+  const tr = document.createElement("tr");
+  tr.innerHTML = `
+      <td>${buildRoleCell(p)}</td>
+      <td class="mono truncate" title="${p.peerId}">${p.peerId}</td>
+      <td class="truncate" title="${escapeHtml(p.name)}">${escapeHtml(p.name)}</td>
+      <td class="nowrap">
+        <div class="progress"><div style="width:${p.percent}%"></div></div>
+        <span class="progress-label">${p.have}/${p.chunkCount} (${p.percent}%)</span>
+      </td>
+      <td class="nowrap" title="${down.title}">${down.cell}</td>
+      <td class="nowrap" title="${up.title}">${up.cell}</td>
+      <td class="nowrap">${p.connections}</td>
+      <td class="nowrap">${p.sources}</td>
+      <td class="actions">
+        ${p.complete && p.role === "leech" ? `<a href="api/peers/${p.id}/file"><button>Tải file</button></a>` : ""}
+        <button class="danger" data-stop="${p.id}">Dừng</button>
+      </td>`;
+  return tr;
+}
+
 async function loadPeers() {
   const list = await fetch("api/peers").then((r) => r.json());
   const tbody = $("#peerTable tbody");
@@ -106,76 +185,8 @@ async function loadPeers() {
   const now = Date.now();
 
   for (const p of list) {
-    const prev = prevSnapshot.get(p.id);
-    let downKBps = 0,
-      upKBps = 0;
-    if (prev) {
-      const dt = (now - prev.t) / 1000;
-      if (dt > 0) {
-        downKBps = Math.max(0, (p.bytesDown - prev.bytesDown) / 1024 / dt);
-        upKBps = Math.max(0, (p.bytesUp - prev.bytesUp) / 1024 / dt);
-      }
-    }
-    prevSnapshot.set(p.id, {
-      bytesDown: p.bytesDown,
-      bytesUp: p.bytesUp,
-      t: now,
-    });
-
-    const roleBadge =
-      p.role === "seed"
-        ? '<span class="badge seed">SEED</span>'
-        : '<span class="badge leech">LEECH</span>';
-    // Icon nhỏ (không phải badge chữ "xong") để không làm ô "Vai trò" giãn to —
-    // tooltip giải thích ý nghĩa khi rê chuột.
-    const doneBadge = p.complete
-      ? '<span class="badge-check" title="Đã hoàn tất">✓</span>'
-      : "";
-
-    // Cột tốc độ tải xuống: đang tải → tốc độ tức thời; đã xong → tốc độ TRUNG
-    // BÌNH cả quá trình (bytesDown/thời gian) thay vì để tụt về 0 gây hiểu lầm
-    // là "không tải được gì". Dùng nhãn chữ "TB" (thay vì ký hiệu toán học ⌀)
-    // để người dùng không quen ký hiệu vẫn hiểu ngay, kèm tooltip giải thích.
-    let downCell = "-",
-      downTitle = "";
-    if (p.role === "leech") {
-      if (!p.complete) {
-        downCell = fmtRate(downKBps);
-      } else if (p.ms > 0) {
-        downTitle = "Tốc độ trung bình cả quá trình tải";
-        downCell = `<span class="rate-tag" title="${downTitle}">TB</span>${fmtRate(p.bytesDown / 1024 / (p.ms / 1000))}`;
-      }
-    }
-    // Cột tốc độ chia sẻ: đang có người tải từ mình → tốc độ tức thời; nếu hiện
-    // tại không ai đang xin chunk (tốc độ tức thời = 0) nhưng đã từng phục vụ
-    // → hiện tổng dung lượng đã chia sẻ (nhãn "Tổng"), tránh hiểu lầm "không hoạt động".
-    let upCell = "-",
-      upTitle = "";
-    if (upKBps > 0) {
-      upCell = fmtRate(upKBps);
-    } else if (p.bytesUp > 0) {
-      upTitle = "Tổng dung lượng đã chia sẻ";
-      upCell = `<span class="rate-tag" title="${upTitle}">Tổng</span>${fmtBytes(p.bytesUp)}`;
-    }
-
-    const tr = document.createElement("tr");
-    tr.innerHTML = `
-      <td><div class="role-cell">${roleBadge}${doneBadge}</div></td>
-      <td class="mono truncate" title="${p.peerId}">${p.peerId}</td>
-      <td class="truncate" title="${escapeHtml(p.name)}">${escapeHtml(p.name)}</td>
-      <td class="nowrap">
-        <div class="progress"><div style="width:${p.percent}%"></div></div>
-        <span class="progress-label">${p.have}/${p.chunkCount} (${p.percent}%)</span>
-      </td>
-      <td class="nowrap" title="${downTitle}">${downCell}</td>
-      <td class="nowrap" title="${upTitle}">${upCell}</td>
-      <td class="nowrap">${p.connections}</td>
-      <td class="nowrap">${p.sources}</td>
-      <td class="actions">
-        ${p.complete && p.role === "leech" ? `<a href="api/peers/${p.id}/file"><button>Tải file</button></a>` : ""}
-        <button class="danger" data-stop="${p.id}">Dừng</button>
-      </td>`;
-    tbody.appendChild(tr);
+    const { downKBps, upKBps } = computeSpeeds(p, now);
+    tbody.appendChild(buildPeerRow(p, downKBps, upKBps));
   }
 
   tbody.querySelectorAll("[data-stop]").forEach((btn) => {
