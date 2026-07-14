@@ -146,6 +146,9 @@ npm run dev
 | `http://localhost:5000/`            | App WebRTC P2P Transfer    |
 | `http://localhost:5000/bittorrent/` | Dashboard BitTorrent-swarm |
 
+Hướng dẫn chi tiết từng bước (cho người mới clone lần đầu, kèm xử lý sự cố):
+[`docs/07_HUONG_DAN_CAI_DAT.md`](docs/07_HUONG_DAN_CAI_DAT.md).
+
 **Chạy kịch bản đo hiệu năng (không cần mở web):**
 
 ```bash
