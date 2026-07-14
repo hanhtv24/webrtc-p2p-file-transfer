@@ -26,11 +26,11 @@ Mở trình duyệt: **http://localhost:5000**
 
 ## Phần A — Hai giao diện trong 1 server (30 giây)
 
-| Bước | Thao tác | Quan sát | Chứng minh |
-|------|----------|----------|-----------|
-| A1 | Trang mở ra là app WebRTC gốc (theme World Cup 2026) | Header có nút **"🧲 BitTorrent Engine"** | Giữ nguyên app cũ, không phá vỡ gì |
-| A2 | Bấm nút đó | Chuyển sang `http://localhost:5000/bittorrent/` — dashboard tối màu, cùng font/màu với app gốc | Hệ BitTorrent-swarm mới đã tích hợp cùng 1 server |
-| A3 | Bấm nút **"⇄ App WebRTC"** ở dashboard mới | Quay lại `/` | 2 hệ chạy song song, độc lập, không xung đột cổng |
+| Bước | Thao tác                                             | Quan sát                                                                                       | Chứng minh                                        |
+| ---- | ---------------------------------------------------- | ---------------------------------------------------------------------------------------------- | ------------------------------------------------- |
+| A1   | Trang mở ra là app WebRTC gốc (theme World Cup 2026) | Header có nút **"🧲 BitTorrent Engine"**                                                       | Giữ nguyên app cũ, không phá vỡ gì                |
+| A2   | Bấm nút đó                                           | Chuyển sang `http://localhost:5000/bittorrent/` — dashboard tối màu, cùng font/màu với app gốc | Hệ BitTorrent-swarm mới đã tích hợp cùng 1 server |
+| A3   | Bấm nút **"⇄ App WebRTC"** ở dashboard mới           | Quay lại `/`                                                                                   | 2 hệ chạy song song, độc lập, không xung đột cổng |
 
 ---
 
@@ -45,7 +45,7 @@ Từ đây, làm việc trên dashboard `/bittorrent/`.
 2. Có thể chỉnh **"Kích thước chunk"** (mặc định 65536 = 64KB), hoặc để nguyên.
 3. Bấm **"Tải lên & chia sẻ"**.
 4. **Quan sát:** dòng thông báo xanh `✓ Đã chia sẻ "<tên file>" — N chunk. Đang
-   seed.` xuất hiện. Bảng **"2. Danh sách torrent"** hiện 1 dòng mới với **Kích
+seed.` xuất hiện. Bảng **"2. Danh sách torrent"** hiện 1 dòng mới với **Kích
    thước**, **Số chunk**, và **Infohash** (định danh duy nhất — là hash SHA-256
    của toàn bộ metadata).
 
@@ -57,7 +57,7 @@ Việc này diễn ra ở `bittorrent/src/torrent.js` (hàm `createMetadata`).
 ### B2 + B3. Tracker / bootstrap server + Peer discovery
 
 1. Nhìn lên **badge ở góc phải header** — hiển thị `http://localhost:4000 ·
-   chunk mặc định ...` — đó là địa chỉ **tracker**, server "danh bạ" chạy riêng.
+chunk mặc định ...` — đó là địa chỉ **tracker**, server "danh bạ" chạy riêng.
 2. Ở dòng torrent vừa tạo, bấm **"⬇ Tải xuống"** — thao tác này tạo ra 1
    **peer LEECHER hoàn toàn mới**, chưa hề biết trước ai đang giữ file.
 3. **Quan sát:** bảng **"3. Peer đang chạy"** xuất hiện thêm 1 dòng `LEECH`.
@@ -89,7 +89,7 @@ càng lớn**, vì mọi người vừa tải vừa chia lại ngay lập tức.
 
 > Nếu file nhỏ nên tải xong quá nhanh không kịp nhìn cột "Nguồn": xem lại kết
 > quả cuối — dù đã 100%, cột **"Nguồn"** vẫn giữ nguyên giá trị cuối cùng (số
-> nguồn *khác nhau* mà peer đó từng tải về trong suốt quá trình) — vẫn đủ để
+> nguồn _khác nhau_ mà peer đó từng tải về trong suốt quá trình) — vẫn đủ để
 > chứng minh với giảng viên dù không kịp xem lúc đang chạy.
 
 ### B6. Kiểm tra toàn vẹn dữ liệu bằng hash
@@ -171,12 +171,12 @@ Mỗi lệnh tự dựng 1 tracker + nhiều peer, in bảng tóm tắt, và ghi
 
 ## Phần E — Chức năng nâng cao khác (điểm cộng, nói nhanh)
 
-| Chức năng | Cách chỉ ra |
-|-----------|-------------|
-| **Rarest-first** | Giải thích khái niệm (ưu tiên tải chunk hiếm nhất trước) + chạy Phần D để có số liệu so sánh |
-| **Thống kê tốc độ up/down** | Đã thấy trực tiếp ở cột "↓ Tải xuống" / "↑ Chia sẻ" trong Phần B4 |
-| **Giao diện (GUI)** | Cả app WebRTC gốc **và** dashboard mới — 2 giao diện, chuyển qua lại bằng nút bấm (Phần A) |
-| **Mô phỏng churn** | Đã demo trực tiếp ở Phần C; ngoài ra `harness/scenarios/churn.json` (Phần D) mô phỏng tự động theo lịch |
+| Chức năng                   | Cách chỉ ra                                                                                             |
+| --------------------------- | ------------------------------------------------------------------------------------------------------- |
+| **Rarest-first**            | Giải thích khái niệm (ưu tiên tải chunk hiếm nhất trước) + chạy Phần D để có số liệu so sánh            |
+| **Thống kê tốc độ up/down** | Đã thấy trực tiếp ở cột "↓ Tải xuống" / "↑ Chia sẻ" trong Phần B4                                       |
+| **Giao diện (GUI)**         | Cả app WebRTC gốc **và** dashboard mới — 2 giao diện, chuyển qua lại bằng nút bấm (Phần A)              |
+| **Mô phỏng churn**          | Đã demo trực tiếp ở Phần C; ngoài ra `harness/scenarios/churn.json` (Phần D) mô phỏng tự động theo lịch |
 
 ---
 
