@@ -106,7 +106,9 @@ async function loadPeers() {
     prevSnapshot.set(p.id, { bytesDown: p.bytesDown, bytesUp: p.bytesUp, t: now });
 
     const roleBadge = p.role === "seed" ? '<span class="badge seed">SEED</span>' : '<span class="badge leech">LEECH</span>';
-    const doneBadge = p.complete ? '<span class="badge done">✓ xong</span>' : "";
+    // Icon nhỏ (không phải badge chữ "xong") để không làm ô "Vai trò" giãn to —
+    // tooltip giải thích ý nghĩa khi rê chuột.
+    const doneBadge = p.complete ? '<span class="badge-check" title="Đã hoàn tất">✓</span>' : "";
 
     // Cột tốc độ tải xuống: đang tải → tốc độ tức thời; đã xong → tốc độ TRUNG
     // BÌNH cả quá trình (bytesDown/thời gian) thay vì để tụt về 0 gây hiểu lầm

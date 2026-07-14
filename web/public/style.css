@@ -232,23 +232,39 @@ tbody tr:hover { background: rgba(245, 166, 35, .04); }
 .nowrap { white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
 .mono { font-family: var(--mono); color: var(--text2); }
 
-/* Vai trò (SEED/LEECH) + badge "✓ xong" xếp DỌC thay vì nằm ngang trên cùng 1
-   dòng — tránh đè chữ lên cột kế bên khi cột hẹp (table-layout: fixed). */
-.role-cell { display: flex; flex-direction: column; align-items: flex-start; gap: 3px; }
+/* Vai trò (SEED/LEECH) + icon "✓" (đã xong) nằm TRÊN 1 DÒNG, icon nhỏ gọn
+   thay vì badge chứ "✓ xong" để không làm ô giãn to. */
+.role-cell { display: flex; flex-direction: row; align-items: center; gap: 4px; flex-wrap: wrap; }
 
 /* Cho phép nút trong ô hành động xuống dòng thay vì tràn ra ngoài bảng */
 .actions { white-space: normal; display: flex; flex-wrap: wrap; gap: 5px; align-items: center; }
 
 .empty-hint { padding: 20px; text-align: center; color: var(--text3); font-size: 0.85rem; display: none; }
 
-.badge.seed, .badge.leech, .badge.done {
+.badge.seed, .badge.leech {
   display: inline-flex; padding: 2px 8px; border-radius: 999px;
   font-size: 10px; font-weight: 700; letter-spacing: .04em;
   background: none; border: none; max-width: none;
 }
 .badge.seed { background: var(--green-dim); color: var(--green); border: 1px solid rgba(34, 197, 94, .25); }
 .badge.leech { background: var(--blue-dim); color: var(--blue); border: 1px solid rgba(59, 130, 246, .25); }
-.badge.done { background: rgba(255, 255, 255, .06); color: var(--text2); border: 1px solid var(--border); margin-left: 4px; }
+
+/* Icon tròn nhỏ báo "đã hoàn tất" — gọn hơn badge chứ rất nhiều, xem chú thích
+   qua tooltip (title) thay vì ghi chự "xong" chiếm chỗ. */
+.badge-check {
+  display: inline-flex; align-items: center; justify-content: center;
+  width: 15px; height: 15px; border-radius: 50%; flex-shrink: 0;
+  font-size: 10px; font-weight: 700; line-height: 1; cursor: default;
+  background: var(--green-dim); color: var(--green); border: 1px solid rgba(34, 197, 94, .35);
+}
+
+/* Chú giải ký hiệu dùng trong bảng (⌘ = trung bình, Σ = tổng, ✓ = hoàn tất)
+   để người dùng không thắc mằc ý nghĩa cột tốc độ. */
+.table-legend {
+  margin: 8px 2px 0; font-size: 0.78rem; color: var(--text3);
+}
+.table-legend span { color: var(--text2); font-weight: 700; }
+.table-legend .legend-check { color: var(--green); }
 
 .progress {
   position: relative;

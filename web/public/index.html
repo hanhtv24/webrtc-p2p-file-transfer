@@ -90,8 +90,8 @@
                 <th class="col-id">Peer ID</th>
                 <th class="col-name">File</th>
                 <th class="col-progress">Tiến độ</th>
-                <th class="col-speed">↓ tốc độ</th>
-                <th class="col-speed">↑ tốc độ</th>
+                <th class="col-speed" title="Tốc độ tải xuống hiện tại (KB/s hay MB/s). Khi đã tải xong, hiển thị tốc độ trung bình (⌘) cả quá trình.">↓ Tải xuống</th>
+                <th class="col-speed" title="Tốc độ chia sả (upload) hiện tại khi có peer khác đang lấy chunk từ bạn. Khi không ai đang tải, hiển thị tổng dung lượng (Σ) đã chia sả.">↑ Chia sả</th>
                 <th class="col-num">Kết nối</th>
                 <th class="col-num">Nguồn</th>
                 <th class="col-action"></th>
@@ -100,6 +100,7 @@
             <tbody></tbody>
           </table>
           <p class="empty-hint" id="peerEmpty">Chưa có peer nào đang chạy.</p>
+          <p class="table-legend"><span>⌘</span> tốc độ trung bình &nbsp;·&nbsp; <span>Σ</span> tổng dung lượng đã truyền &nbsp;·&nbsp; <span class="legend-check">✓</span> đã hoàn tất</p>
         </div>
       </section>
     </main>
