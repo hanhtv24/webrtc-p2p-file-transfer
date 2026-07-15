@@ -30,6 +30,17 @@ HTTT_*.pdf
 Bài\ tập\ lớn.*
 docs/KIEM_THU_WEBRTC.md
 
+# Tài liệu kỹ thuật nội bộ (đã gộp vào báo cáo chính) — giữ lại trên máy để
+# tham khảo, không đẩy lên git
+docs/01_PHAN_TICH_DU_AN.md
+docs/02_HARNESS.md
+docs/03_DANH_GIA_DE_BAI.md
+docs/04_SLIDE_OUTLINE.md
+docs/05_HUONG_DAN_DEMO.md
+docs/06_GIOI_THIEU_DU_AN.md
+docs/07_HUONG_DAN_CAI_DAT.md
+docs/README.md
+
 # Ngoại lệ: báo cáo chính thức nộp bài — đẩy lên repo
 !docs/CHTPT_Nhóm_10_Hệ thống chia sẻ file ngang hàng (P2P).pdf
 
